@@ -1,0 +1,4359 @@
+---
+swagger: "2.0"
+info:
+  description: "This API intends to provide an interface between\n- Account Servicing\
+    \ Payment Service Providers (ASPSP)\n- Third Party (Payment Service) Providers\
+    \ (TPP)\n\nTPP may act with different roles as described below:\n- Account Information\
+    \ Service Providers (AISP)\n- Payment Initiation Service Providers (PISP)\n- Payment\
+    \ Instrument Issuer Service Providers (PIISP)\n\nThe Payment Service User (PSU)\
+    \ is the owner of the accounts held by the ASPSP and gives accreditations to the\
+    \ TPP in order to access his accounts information or initiates payment from these\
+    \ accounts\n\nThe API is designed on a REST model using JSON structures.\n\nThe\
+    \ Richardson Maturity Model is applied on level three using HAL HYPERMEDIA links\n\
+    \nThis version implements\n- CR1: Allow a TPP to suggest a SCA execution or a\
+    \ SCA exemption through the API\n- CR93: Client Credential OAUTH2 TOKEN for PIISP\n\
+    - CR148: Allow the use of the payment-request also for payment on behalf of the\
+    \ ordering party\n- CR158: Implementation of access (Read-Only) to the list of\
+    \ trusted beneficiaries\n- CR159: Payment request with no immediate execution\
+    \ of an instruction\n- CR160: Recurrent payments handling\n- CR161: Payment initiation\
+    \ with multiple instructions \n- CR164: Implement mixed consent management model\
+    \ for AISP\n- CR179: Forward Information about the beneficiary to be registered\
+    \ as trusted or not to the PISP\n- CR180: Forward Information about the availability\
+    \ of funds to the PISP\n- CR181: Removal of FULL ASPSP (B2) consent model \n-\
+    \ CR182: Cancellation of payment requests\n- CR184: Removal of transfer-requests\
+    \ resource\n- CR185: Add CARD account payment Type\n- CR188: Externalize common\
+    \ HTTP return codes\n- CR189: Add a payload to each HTTP return code\n- CR191:\
+    \ Set a Max value for [numberOfTransactions] field\n- CR194: Merge \"payment-requests\"\
+    \ and \"periodic-payment-requests\" API entry-points\n- CR195: Use a PUT entry-point\
+    \ in order to implement cancellation of payments\n- CR197: Add connected PSU's\
+    \ last name et first name\n- CR198: Allow the PISP to suggest the insertion the\
+    \ beneficiary of the payment within the trusted beneficiaries list\n- CR199: Apply\
+    \ HTTP signature on response sent by ASPSP\n \n"
+  version: "1.4.0.47"
+  title: "PSD2 ASPSP services for AISP, PISP and PIISP."
+  contact:
+    name: "STET"
+    url: "https://www.stet.eu/en/psd2/"
+    email: "psd2@stet.eu"
+  license:
+    name: "Creative Commons Attribution 3.0 France (CC BY 3.0 FR)"
+basePath: "/v1"
+schemes:
+- "https"
+consumes:
+- "application/json"
+paths:
+  /accounts:
+    get:
+      tags:
+      - "AISP"
+      summary: "Retrieval of the PSU accounts (AISP)"
+      description: "<h3>Description</h3>\n  This call returns all payment accounts\
+        \ that are relevant the PSU on behalf of whom the AISP is connected.\n  Thanks\
+        \ to HYPERMEDIA, each account is returned with the links aiming to ease access\
+        \ to the relevant transactions and balances.\n  The result may be subject\
+        \ to pagination (i.e. retrieving a partial result in case of having too many\
+        \ results) through a set of pages by the ASPSP. Thereafter, the AISP may ask\
+        \ for the first, next, previous or last page of results.\n<h3>Prerequisites</h3>\n\
+        \  <ul>\n    <li>The TPP has been registered by the Registration Authority\
+        \ for the AISP role.</li>\n    <li>The TPP and the PSU have a contract that\
+        \ has been enrolled by the ASPSP</li>\n      <ul>\n        <li>At this step,\
+        \ the ASPSP has delivered an OAUTH2 \"Authorization Code\" or \"Resource Owner\
+        \ Password\" access token to the TPP (cf. § 3.4.2).</li>\n      </ul>\n  \
+        \  <li>The TPP and the ASPSP have successfully processed a mutual check and\
+        \ authentication</li>\n    <li>The TPP has presented its OAUTH2 \"Authorization\
+        \ Code\" or \"Resource Owner Password\" access token which allows the ASPSP\
+        \ to identify the relevant PSU and retrieve the linked PSU context (cf. §\
+        \ 3.4.2) if any.</li>\n    <li>The ASPSP takes into account the access token\
+        \ that establishes the link between the PSU and the AISP.</li>\n  </ul>\n\
+        <h3>Business Flow</h3>\n  The TPP sends a request to the ASPSP for retrieving\
+        \ the list of the PSU payment accounts.\n  The ASPSP computes the relevant\
+        \ PSU accounts and builds the answer as an accounts list. \n  The result may\
+        \ be subject to pagination in order to avoid an excessive result set. \n \
+        \ Each payment account will be provided with its characteristics.\n"
+      operationId: "accountsGet"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "The ASPSP return a PSU context \n- listing the accounts that\
+            \ have been made available to the AISP by the PSU and, \n- for each of\
+            \ these accounts, the further transactions that have been enabled by the\
+            \ PSU through HYPERMEDIA links.\n"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/HalAccounts"
+        204:
+          description: "No content."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        404:
+          description: "Not found, no request available."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - accessCode:
+        - "aisp"
+      - resourceOwnerIdentification:
+        - "aisp"
+  /accounts/{accountResourceId}/balances:
+    get:
+      tags:
+      - "AISP"
+      summary: "Retrieval of an account balances report (AISP)"
+      description: "<h3>Description</h3>\n  This call returns a set of balances for\
+        \ a given PSU account that is specified by the AISP through an account resource\
+        \ Identification\n  <ul>\n    <li>The ASPSP must provide at least the accounting\
+        \ balance on the account.</li>\n    <li>The ASPSP can provide other balance\
+        \ restitutions, e.g. instant balance, as well, if possible.</li>\n    <li>Actually,\
+        \ from the PSD2 perspective, any other balances that are provided through\
+        \ the Web-Banking service of the ASPSP must also be provided by this ASPSP\
+        \ through the API.</li>\n  </ul>\n<h3>Prerequisites</h3>\n  <ul>\n    <li>The\
+        \ TPP has been registered by the Registration Authority for the AISP role</li>\n\
+        \    <li>The TPP and the PSU have a contract that has been enrolled by the\
+        \ ASPSP\n    <ul style=\"list-style-type:circle;\">\n      <li>At this step,\
+        \ the ASPSP has delivered an OAUTH2 &ldquo;Authorization Code&rdquo; or &ldquo;Resource\
+        \ Owner Password&rdquo; access token to the TPP (cf. &sect; 3.4.2).</li>\n\
+        \    </ul>\n    </li>\n    <li>The TPP and the ASPSP have successfully processed\
+        \ a mutual check and authentication</li>\n    <li>The TPP has presented its\
+        \ OAUTH2 &ldquo;Authorization Code&rdquo; or &ldquo;Resource Owner Password&rdquo;\
+        \ access token which allows the ASPSP to identify the relevant PSU and retrieve\
+        \ the linked PSU context (cf. &sect; 3.4.2) if any.</li>\n    <li>The ASPSP\
+        \ takes into account the access token that establishes the link between the\
+        \ PSU and the AISP.</li>\n    <li>The TPP has previously retrieved the list\
+        \ of available accounts for the PSU</li>\n  </ul>\n<h3>Business flow</h3>\n\
+        \  The AISP requests the ASPSP on one of the PSU&rsquo;s accounts.<br />\n\
+        \  The ASPSP answers by providing a list of balances on this account.\n  <ul>\n\
+        \    <li>The ASPSP must provide at least the accounting balance on the account.</li>\n\
+        \    <li>The ASPSP can provide other balance restitutions, e.g. instant balance,\
+        \ as well, if possible.</li>\n    <li>Actually, from the PSD2 perspective,\
+        \ any other balances that are provided through the Web-Banking service of\
+        \ the ASPSP must also be provided by this ASPSP through the API.</li>\n  </ul>\n"
+      operationId: "accountsBalancesGet"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "accountResourceId"
+        in: "path"
+        description: "Identification of account resource to fetch"
+        required: true
+        type: "string"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "The ASPSP answers with a list of account balances"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/HalBalances"
+        204:
+          description: "No content."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        404:
+          description: "Not found, no request available."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - accessCode:
+        - "aisp"
+      - resourceOwnerIdentification:
+        - "aisp"
+  /accounts/{accountResourceId}/transactions:
+    get:
+      tags:
+      - "AISP"
+      summary: "Retrieval of an account transaction set (AISP)"
+      description: "<h3>Description</h3>\n  This call returns transactions for an\
+        \ account for a given PSU account that is specified by the AISP through an\
+        \ account resource identification.\n  The request may use some filter parameter\
+        \ in order to restrict the query \n  <ul>\n    <li>on a given imputation date\
+        \ range</li>\n    <li>past a given incremental technical identification</li>\n\
+        \  </ul>\n  The result may be subject to pagination (i.e. retrieving a partial\
+        \ result in case of having too many results) through a set of pages by the\
+        \ ASPSP. Thereafter, the AISP may ask for the first, next, previous or last\
+        \ page of results.\n<h3>Prerequisites</h3>\n  <ul>\n    <li>The TPP has been\
+        \ registered by the Registration Authority for the AISP role</li>\n    <li>The\
+        \ TPP and the PSU have a contract that has been enrolled by the ASPSP</li>\n\
+        \    <ul>\n      <li>At this step, the ASPSP has delivered an OAUTH2 \"Authorization\
+        \ Code\" or \"Resource Owner Password\" access token to the TPP (cf. § 3.4.2).</li>\n\
+        \    </ul>\n    <li>The TPP and the ASPSP have successfully processed a mutual\
+        \ check and authentication </li>\n    <li>The TPP has presented its OAUTH2\
+        \ \"Authorization Code\" or \"Resource Owner Password\" access token which\
+        \ allows the ASPSP to identify the relevant PSU and retrieve the linked PSU\
+        \ context (cf. § 3.4.2) is any.</li>\n    <li>The ASPSP takes into account\
+        \ the access token that establishes the link between the PSU and the AISP.</li>\n\
+        \    <li>The TPP has previously retrieved the list of available accounts for\
+        \ the PSU</li>\n  </ul>\n<h3>Business flow</h3>\n  The AISP requests the ASPSP\
+        \ on one of the PSU’s accounts. It may specify some selection criteria.\n\
+        \  The ASPSP answers by a set of transactions that matches the query. The\
+        \ result may be subject to pagination in order to avoid an excessive result\
+        \ set.\n"
+      operationId: "accountsTransactionsGet"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "accountResourceId"
+        in: "path"
+        description: "Identification of account resource to fetch"
+        required: true
+        type: "string"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      - name: "dateFrom"
+        in: "query"
+        description: "Inclusive minimal imputation date of the transactions. \n  \
+          \    \nTransactions having an imputation date equal to this parameter are\
+          \ included within the result.\n"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "dateTo"
+        in: "query"
+        description: "Exclusive maximal imputation date of the transactions. \n  \
+          \    \nTransactions having an imputation date equal to this parameter are\
+          \ not included within the result.\n"
+        required: false
+        type: "string"
+        format: "date-time"
+      - name: "afterEntryReference"
+        in: "query"
+        description: "Specifies the value on which the result has to be computed.\
+          \ \n      \nOnly the transaction having a technical identification greater\
+          \ than this value must be included within the result\n"
+        required: false
+        type: "string"
+        maxLength: 40
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "Complete transactions response"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/HalTransactions"
+        204:
+          description: "No content."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        404:
+          description: "Not found, no request available."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - accessCode:
+        - "aisp"
+      - resourceOwnerIdentification:
+        - "aisp"
+  /consents:
+    put:
+      tags:
+      - "AISP"
+      summary: "Forwarding the PSU consent (AISP)"
+      description: "<h3>Description</h3>\n  In the mixed detailed consent on accounts\n\
+        \  <ul>\n    <li>the AISP captures the consent of the PSU</li>\n    <li>then\
+        \ it forwards this consent to the ASPSP</li>\n  </ul>\n  This consent replaces\
+        \ any prior consent that was previously sent by the AISP.\n<h3>Prerequisites</h3>\n\
+        \  <ul>\n    <li>The TPP has been registered by the Registration Authority\
+        \ for the AISP role.</li>\n    <li>The TPP and the PSU have a contract that\
+        \ has been enrolled by the ASPSP</li>\n      <ul>\n      <li>At this step,\
+        \ the ASPSP has delivered an OAUTH2 \"Authorization Code\" or \"Resource Owner\
+        \ Password\" access token to the TPP (cf. § 3.4.2).</li>\n      </ul>\n  \
+        \  <li>The TPP and the ASPSP have successfully processed a mutual check and\
+        \ authentication</li>\n    <li>The TPP has presented its OAUTH2 \"Authorization\
+        \ Code\" or \"Resource Owner Password\" access token which allows the ASPSP\
+        \ to identify the relevant PSU and retrieve the linked PSU context (cf. §\
+        \ 3.4.2) if any.</li>\n    <li>The ASPSP takes into account the access token\
+        \ that establishes the link between the PSU and the AISP.</li>\n  </ul>\n\
+        <h3>Business Flow</h3>\n  The PSU specifies to the AISP which of his/her accounts\
+        \ will be accessible and which functionalities should be available.\n  The\
+        \ AISP forwards these settings to the ASPSP.\n  The ASPSP answers by HTTP201\
+        \ return code.\n"
+      operationId: "consentsPut"
+      produces:
+      - "application/json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "access"
+        description: "List of consents granted to the AISP by the PSU."
+        required: false
+        schema:
+          $ref: "#/definitions/Access"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        201:
+          description: "Created"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - accessCode:
+        - "aisp"
+      - resourceOwnerIdentification:
+        - "aisp"
+  /trusted-beneficiaries:
+    get:
+      tags:
+      - "AISP"
+      summary: "Retrieval of the trusted beneficiaries list (AISP)"
+      description: "<h3>Description</h3>\n  This call returns all trusted beneficiaries\
+        \ that have been set by the PSU.\n  Those beneficiaries can benefit from an\
+        \ SCA exemption during payment initiation.\n  The result may be subject to\
+        \ pagination (i.e. retrieving a partial result in case of having too many\
+        \ results) through a set of pages by the ASPSP. Thereafter, the AISP may ask\
+        \ for the first, next, previous or last page of results.\n<h3>Prerequisites</h3>\n\
+        \  <ul>\n    <li>The TPP has been registered by the Registration Authority\
+        \ for the AISP role.</li>\n    <li>The TPP and the PSU have a contract that\
+        \ has been enrolled by the ASPSP</li>\n      <ul>\n        <li>At this step,\
+        \ the ASPSP has delivered an OAUTH2 \"Authorization Code\" or \"Resource Owner\
+        \ Password\" access token to the TPP (cf. § 3.4.2).</li>\n      </ul>\n  \
+        \  <li>The TPP and the ASPSP have successfully processed a mutual check and\
+        \ authentication</li>\n    <li>The TPP has presented its OAUTH2 \"Authorization\
+        \ Code\" or \"Resource Owner Password\" access token which allows the ASPSP\
+        \ to identify the relevant PSU and retrieve the linked PSU context (cf. §\
+        \ 3.4.2) if any.</li>\n    <li>The ASPSP takes into account the access token\
+        \ that establishes the link between the PSU and the AISP.</li>\n  </ul>\n\
+        <h3>Business Flow</h3>\n  The AISP asks for the trusted beneficiaries list.\n\
+        \  The ASPSP answers with a list of beneficiary details structure.\n"
+      operationId: "trustedBeneficiariesGet"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "The ASPSP returns the list of whitelisted beneficiaries \n"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/HalBeneficiaries"
+        204:
+          description: "No content."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        404:
+          description: "Not found, no request available."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - accessCode:
+        - "aisp"
+      - resourceOwnerIdentification:
+        - "aisp"
+  /funds-confirmations:
+    post:
+      tags:
+      - "PIISP"
+      summary: "Payment coverage check request (PIISP)"
+      description: "<h3>Description</h3>\nThe PIISP can ask an ASPSP to check if a\
+        \ given amount can be covered by the liquidity that is available on a PSU\
+        \ cash account or payment card.\n<h3>Prerequisites</h3>\n<ul>\n  <li>The TPP\
+        \ has been registered by the Registration Authority for the PIISP role</li>\n\
+        \  <li>The TPP and the PSU have a contract that has been registered by the\
+        \ ASPSP</li>\n  <ul>\n    <li>At this step, the ASPSP has delivered an \"\
+        Authorization Code\", a \"Resource Owner Password\" or a \"Client Credential\"\
+        \ OAUTH2 access token to the TPP (cf. § 3.4.2).</li>\n    <li>Each ASPSP has\
+        \ to implement either the \"Authorization Code\"/\"Resource Owner Password\"\
+        \ or the \"Client Credential\" OAUTH2 access token model.</li>\n    <li>Doing\
+        \ this, it will edit the [security] section on this path in order to specify\
+        \ which model it has chosen</li>\n  </ul>\n  <li>The TPP and the ASPSP have\
+        \ successfully processed a mutual check and authentication </li>\n  <li>The\
+        \ TPP has presented its OAUTH2 \"Authorization Code\" or \"Resource Owner\
+        \ Password\" access token which allows the ASPSP to identify the relevant\
+        \ PSU.</li>\n</ul>\n<h3>Business flow</h3>\nThe PIISP requests the ASPSP for\
+        \ a payment coverage check against either a bank account or a card primary\
+        \ identifier.\nThe ASPSP answers with a structure embedding the original request\
+        \ and the result as a Boolean.      \n"
+      operationId: "fundsConfirmationsPost"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "paymentCoverage"
+        description: "parameters of a payment coverage request"
+        required: true
+        schema:
+          $ref: "#/definitions/PaymentCoverageRequestResource"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "payment coverage request"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+            Digest:
+              type: "string"
+              description: "Digest of the body"
+            Signature:
+              type: "string"
+              description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+                The keyId must specify the way to get the relevant qualified certificate.\
+                \ It is requested that this identifier is an URL aiming to provide\
+                \ the relevant Qualified Certificate.\n"
+          schema:
+            $ref: "#/definitions/HalPaymentCoverageReport"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - accessCode:
+        - "piisp"
+      - resourceOwnerIdentification:
+        - "piisp"
+      - clientCredentials:
+        - "piisp"
+  /payment-requests:
+    post:
+      tags:
+      - "PISP"
+      summary: "Payment request initiation (PISP)"
+      description: "<h3>Description</h3>\nThe following use cases can be applied:\n\
+        <ul>\n  <li>payment request on behalf of a merchant</li>\n  <li>transfer request\
+        \ on behalf of the account's owner</li>\n  <li>standing-order request on behalf\
+        \ of the account's owner</li>\n</ul>\n<h4>Data content</h4>\n  A payment request\
+        \ or a transfer request might embed several payment instructions having\n\
+        \  <ul>\n    <li>one single execution date or multiple execution dates</li>\n\
+        \    <ul>\n      <li>case of one single execution date, this date must be\
+        \ set at the payment level</li>\n      <li>case of multiple execution dates,\
+        \ those dates must be set at each payment instruction level</li>\n    </ul>\
+        \                 \n    <li>one single beneficiary or multiple beneficiaries</li>\n\
+        \    <ul>\n      <li>case of one single beneficiary, this beneficiary must\
+        \ be set at the payment level</li>\n      <li>case of multiple beneficiaries,\
+        \ those beneficiaries must be set at each payment instruction level</li>\n\
+        \    </ul>                 \n  </ul>        \n  A standing order request must\
+        \ embed one single payment instruction and must address one single beneficiary.\n\
+        \  <ul>\n    <li>The beneficiary must be set at the payment level</li>\n \
+        \   <li>The standing order specific characteristics (start date, periodicity...)\
+        \ must be set at the instruction level</li>\n  </ul>                 \n<h4>Prerequisites\
+        \ for all use cases</h4>\n<ul>\n  <li>The TPP has been registered by the Registration\
+        \ Authority for the PISP role</li>\n  <li>The TPP was provided with an OAUTH2\
+        \ \"Client Credential\" access token by the ASPSP (cf. § 3.4.3).</li>\n  <li>The\
+        \ TPP and the ASPSP have successfully processed a mutual check and authentication\
+        \ </li>\n  <li>The TPP has presented its \"OAUTH2 Client Credential\" access\
+        \ token</li>\n</ul>\n<h4>Business flow</h4>\n  <h5>Payment Request use case</h5>\n\
+        \    The PISP forwards a payment request on behalf of a merchant.<br>\n  \
+        \  The PSU buys some goods or services on an e-commerce website held by a\
+        \ merchant. Among other payment method, the merchant suggests the use of a\
+        \ PISP service. As there is obviously a contract between the merchant and\
+        \ the PISP, there is no need of such a contract between the PSU and this PISP\
+        \ to initiate the process.<br>\n    Case of the PSU that chooses to use the\
+        \ PISP service:<br>\n    <ul>\n      <li>The merchant forwards the requested\
+        \ payment characteristics to the PISP and redirects the PSU to the PISP portal.</li>\n\
+        \      <li>The PISP requests from the PSU which ASPSP will be used.</li>\n\
+        \      <li>The PISP prepares the Payment Request and sends this request to\
+        \ the ASPSP.</li>\n      <li>The Request can embed several payment instructions\
+        \ having different requested execution date.</li>\n      <li>The beneficiary,\
+        \ as being the merchant, is set at the payment level.</li>\n    </ul> \n \
+        \ <h5>Transfer Request use case</h5>\n    The PISP forwards a transfer request\
+        \ on behalf of the owner of the account.\n    <ul>\n      <li>The PSU provides\
+        \ the PISP with all information needed for the transfer.</li>\n      <li>The\
+        \ PISP prepares the Transfer Request and sends this request to the relevant\
+        \ ASPSP that holds the debtor account.</li>\n      <li>The Request can embed\
+        \ several payment instructions having different beneficiaries.</li>\n    \
+        \  <li>The requested execution date, as being the same for all instructions,\
+        \ is set at the payment level.</li>\n    </ul> \n  <h5>Standing Order Request\
+        \ use case</h5>\n    The PISP forwards a Standing Order request on behalf\
+        \ of the owner of the account.\n    <ul>\n      <li>The PSU provides the PISP\
+        \ with all information needed for the Standing Order.</li>\n      <li>The\
+        \ PISP prepares the Standing Order Request and sends this request to the relevant\
+        \ ASPSP that holds the debtor account.</li>\n      <li>The Request embeds\
+        \ one single payment instruction with</li>\n      <ul>\n        <li>The requested\
+        \ execution date of the first occurrence</li>\n        <li>The requested execution\
+        \ frequency of the payment in order to compute further execution dates</li>\n\
+        \        <li>An execution rule to handle cases when the computed execution\
+        \ dates cannot be processed (e.g. bank holydays)</li>\n        <li>An optional\
+        \ end date for closing the standing Order</li>\n      </ul>\n    </ul> \n\
+        <h4>Authentication flows for all use cases</h4>\n  As the request posted by\
+        \ the PISP to the ASPSP needs a PSU authentication before execution, this\
+        \ request will include:\n  <ul>\n    <li>The specification of the authentication\
+        \ approaches that are supported by the PISP (any combination of \"REDIRECT\"\
+        , \"EMBEDDED\" and \"DECOUPLED\" values).</li>\n    <li>In case of possible\
+        \ REDIRECT or DECOUPLED authentication approach, one or two call-back URLs\
+        \ to be used by the ASPSP at the finalisation of the authentication and consent\
+        \ process :</li>\n    <ul>\n      <li>The first call-back URL will be called\
+        \ by the ASPSP if the Payment Request is processed without any error or rejection\
+        \ by the PSU</li>\n      <li>The second call-back URL is to be used by the\
+        \ ASPSP in case of processing error or rejection by the PSU. Since this second\
+        \ URL is optional, the PISP might not provide it. In this case, the ASPSP\
+        \ will use the same URL for any processing result.</li>\n      <li>Both call-back\
+        \ URLS must be used in a TLS-secured request.</li>\n    </ul>\n    <li>In\
+        \ case of possible \"EMBEDDED\" or \"DECOUPLED\" approaches, the PSU identifier\
+        \ that can be processed by the ASPSP for PSU recognition must have been set\
+        \ within the request body [debtor] structure.</li>\n  </ul>\n  The ASPSP saves\
+        \ the request and answers to the PISP. The answer embeds:\n  <ul>\n    <li>A\
+        \ location link of the saved Request that will be further used to retrieve\
+        \ the Request and its status information.</li>\n    <li>The specification\
+        \ of the chosen authentication approach taking into account both the PISP\
+        \ and the PSU capabilities.</li>\n    <li>In case of chosen REDIRECT authentication\
+        \ approach, the URL to be used by the PISP for redirecting the PSU in order\
+        \ to perform a authentication.</li>\n  </ul>\n  Case of the PSU neither gives\
+        \ nor denies his/her consent, the Request shall expire and is then rejected\
+        \ to the PISP. The expiration delay is specified by each ASPSP.<br>\n  <h5>Redirect\
+        \ authentication approach </h5>\n    When the chosen authentication approach\
+        \ within the ASPSP answers is set to \"REDIRECT\":<br>\n    <ul>\n      <li>The\
+        \ PISP redirects the PSU to the ASPSP which authenticates the PSU </li>\n\
+        \      <li>The ASPSP asks the PSU to give (or deny) his/her consent to the\
+        \ Payment Request</li>\n      <li>The PSU chooses or confirms which of his/her\
+        \ accounts shall be used by the ASPSP for the future Credit Transfer.</li>\n\
+        \      <li>The ASPSP is then able to initiate the subsequent Credit Transfer</li>\n\
+        \      <li>The ASPSP redirects the PSU to the PISP using one of the call-back\
+        \ URLs provided within the posted Payment Request</li>\n    </ul>\n    <img\
+        \ src=\"PISP Redirect Authentication.png\" />\n    <img src=\"PISP Redirect\
+        \ Authentication2.png\" />\n  <h5>Decoupled authentication approach</h5>\n\
+        \    When the chosen authentication approach is \"DECOUPLED\":<br>\n    <ul>\n\
+        \      <li>Based on the PSU identifier provided within the Payment Request\
+        \ by the PISP, the ASPSP gives the PSU with the Payment Request details and\
+        \ challenges the PSU for a Strong Customer Authentication on a decoupled device\
+        \ or application.</li>\n      <li>The PSU chooses or confirms which of his/her\
+        \ accounts shall be used by the ASPSP for the future Credit Transfer.</li>\n\
+        \      <li>The ASPSP is then able to initiate the subsequent Credit Transfer</li>\n\
+        \      <li>The ASPSP notifies the PISP about the finalisation of the authentication\
+        \ and consent process by using one of the call-back URLs provided within the\
+        \ posted Payment Request</li>\n    </ul>\n    <img src=\"PISP Decoupled Authentication.png\"\
+        \ />\n    <img src=\"PISP Decoupled Authentication2.png\" />\n  <h5>Embedded\
+        \ authentication approach</h5>\n    When the chosen authentication approach\
+        \ within the ASPSP answers is set to \"EMBEDDED\":<br>\n    <ul>\n      <li>The\
+        \ TPP informs the PSU that a challenge is needed for completing the Payment\
+        \ Request processing. This challenge will be one of the following:</li>\n\
+        \      <ul>\n        <li>A One-Time-Password sent by the ASPSP to the PSU\
+        \ on a separate device or application.</li>\n        <li>A response computed\
+        \ by a specific device on base of a challenge sent by the ASPSP to the PSU\
+        \ on a separate device or application.</li>\n      </ul>\n      <li>The PSU\
+        \ unlock the device or application through a \"knowledge factor\" and/or an\
+        \ \"inherence factor\" (biometric), retrieves the Payment Request details\
+        \ and processes the data sent by the ASPSP; </li>\n      <li>The PSU might\
+        \ choose or confirm which of his/her accounts shall be used by the ASPSP for\
+        \ the future Credit Transfer when the device or application allows it.</li>\n\
+        \      <li>When agreeing the Payment Request, the PSU enters the resulting\
+        \ authentication factor through the PISP interface which will forward it to\
+        \ the ASPSP through a confirmation request (cf. § 4.7)</li>\n    </ul>\n \
+        \   <img src=\"PISP Embedded Authentication.png\" />\n    <img src=\"PISP\
+        \ Embedded Authentication2.png\" />\n"
+      operationId: "paymentRequestsPost"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "paymentRequest"
+        description: "ISO20022 based payment Initiation Request"
+        required: true
+        schema:
+          $ref: "#/definitions/PaymentRequestResource"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        201:
+          description: "The request has been created as a resource. The ASPSP must\
+            \ authenticate the PSU."
+          headers:
+            location:
+              type: "string"
+              description: "URI of the created (and updated if needed) Payment Request.\
+                \ \nActually, this link is the URI to be used (cf. § 4.6) for retrieving\
+                \ the Payment Request ant its status:\n  - GET /payment-requests/{paymentRequestResourceId}\n\
+                The parameter {paymentRequestResourceId} is the identifier of the\
+                \ Payment Request, as the resource that was created on the ASPSP server\
+                \ side.                        \n"
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+            Digest:
+              type: "string"
+              description: "Digest of the body"
+            Signature:
+              type: "string"
+              description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+                The keyId must specify the way to get the relevant qualified certificate.\
+                \ It is requested that this identifier is an URL aiming to provide\
+                \ the relevant Qualified Certificate.\n"
+          schema:
+            $ref: "#/definitions/HalPaymentRequestCreation"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - clientCredentials:
+        - "pisp"
+  /payment-requests/{paymentRequestResourceId}:
+    get:
+      tags:
+      - "PISP"
+      summary: "Retrieval of a payment request (PISP)"
+      description: "<h3>Description</h3>\nThe following use cases can be applied:\n\
+        <ul>\n  <li>retrieval of a payment request on behalf of a merchant</li>\n\
+        \  <li>retrieval of a transfer request on behalf of the account's owner</li>\n\
+        \  <li>retrieval of a standing-order request on behalf of the account's owner</li>\n\
+        </ul>\nThe PISP has sent a Request through a POST command. <br>\n  The ASPSP\
+        \ has registered the Request, updated if necessary the relevant identifiers\
+        \ in order to avoid duplicates and returned the location of the updated Request.<br>\n\
+        \  The PISP gets the Request that might have been updated with the resource\
+        \ identifiers, the status of the Payment/Transfer Request and the status of\
+        \ the subsequent credit transfer.<br>\n<h3>Prerequisites</h3>\n<ul>\n  <li>The\
+        \ TPP has been registered by the Registration Authority for the PISP role</li>\n\
+        \  <li>The TPP was provided with an OAUTH2 \"Client Credential\" access token\
+        \ by the ASPSP (cf. § 3.4.3).</li>\n  <li>The TPP has previously posted a\
+        \ Request which has been saved by the ASPSP (cf. § 4.5.3)</li>\n  <ul>\n \
+        \   <li>The ASPSP has answered with a location link to the saved Payment/Transfer\
+        \ Request (cf. § 4.5.4)</li>\n  </ul>\n  <li>The TPP and the ASPSP have successfully\
+        \ processed a mutual check and authentication </li>\n  <li>The TPP has presented\
+        \ its \"OAUTH2 Client Credential\" access token</li>\n</ul>\n<h3>Business\
+        \ flow</h3>\nThe PISP asks to retrieve the Payment/Transfer Request that has\
+        \ been saved by the ASPSP. The PISP uses the location link provided by the\
+        \ ASPSP in response of the posting of this request.<br>\nThe ASPSP returns\
+        \ the previously posted Payment/Transfer Request which is enriched with:<br>\n\
+        <ul>\n  <li>The resource identifiers given by the ASPSP</li>\n  <li>The status\
+        \ information of the Payment Request and of the subsequent credit transfer</li>\n\
+        </ul>\nThe status information must be available during at least 30 calendar\
+        \ days after the posting of the Payment Request. However, the ASPSP may increase\
+        \ this availability duration, based on its own rules.<br>\n"
+      operationId: "paymentRequestsGet"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "paymentRequestResourceId"
+        in: "path"
+        description: "Identification of the Payment Request Resource"
+        required: true
+        type: "string"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "Retrieval of the previously posted Payment Request"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+            Digest:
+              type: "string"
+              description: "Digest of the body"
+            Signature:
+              type: "string"
+              description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+                The keyId must specify the way to get the relevant qualified certificate.\
+                \ It is requested that this identifier is an URL aiming to provide\
+                \ the relevant Qualified Certificate.\n"
+          schema:
+            $ref: "#/definitions/HalPaymentRequest"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        404:
+          description: "Not found, no request available."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - clientCredentials:
+        - "pisp"
+    put:
+      tags:
+      - "PISP"
+      summary: "Modification of a Payment/Transfer Request (PISP)"
+      description: "<h3>Description</h3>\nThe PISP sent a Payment/Transfer Request\
+        \ through a POST command.<br>\n  The ASPSP registered the Payment/Transfer\
+        \ Request, updated if necessary the relevant identifiers in order to avoid\
+        \ duplicates and returned the location of the updated Request.<br>\n  The\
+        \ PISP got the Payment/Transfer Request that might have been updated with\
+        \ the resource identifiers, the status of the Payment/Transfer Request and\
+        \ the status of the subsequent credit transfer.<br>\n  The PISP request for\
+        \ the payment cancellation or for some payment instructions cancellation<br>\n\
+        \  No other modification of the Payment/Transfer Request is allowed.<br/>\n\
+        <h3>Prerequisites</h3>\n<ul>\n  <li>The TPP was registered by the Registration\
+        \ Authority for the PISP role</li>\n  <li>The TPP was provided with an OAUTH2\
+        \ \"Client Credential\" access token by the ASPSP (cf. § 3.4.3).</li>\n  <li>The\
+        \ TPP previously posted a Payment/Transfer Request which was saved by the\
+        \ ASPSP (cf. § 4.5.3)</li>\n  <ul>\n    <li>The ASPSP answered with a location\
+        \ link to the saved Payment/Transfer Request (cf. § 4.5.4)</li>\n    <li>The\
+        \ PISP retrieved the saved Payment/Transfer Request (cf. § 4.5.4)</li>\n \
+        \ </ul>\n  <li>The TPP and the ASPSP successfully processed a mutual check\
+        \ and authentication </li>\n  <li>The TPP presented its \"OAUTH2 Client Credential\"\
+        \ access token.</li>\n  <li>The TPP presented the payment/transfer request.</li>\n\
+        \  <li>The PSU was successfully authenticated.</li>\n</ul>\n<h3>Business flow</h3>\n\
+        the following cases can be applied:\n<ul>\n  <li>Case of a payment with multiple\
+        \ instructions or a standing order, the PISP asks to cancel the whole Payment/Transfer\
+        \ or Standing Order Request including all non-executed payment instructions\
+        \ by setting the [paymentInformationStatus] to \"RJCT\" and the relevant [statusReasonInformation]\
+        \ to \"DS02\" at payment level.</li>\n  <li>Case of a payment with multiple\
+        \ instructions, the PISP asks to cancel one or several payment instructions\
+        \ by setting the [transactionStatus] to \"RJCT\" and the relevant [statusReasonInformation]\
+        \ to \"DS02\" at each relevant instruction level.</li>\n</ul>\nSince the modification\
+        \ request needs a PSU authentication before committing, the modification request\
+        \ includes:</li>\n  <ul>\n    <li>The specification of the authentication\
+        \ approaches that are supported by the PISP (any combination of \"REDIRECT\"\
+        , \"EMBEDDED\" and \"DECOUPLED\" values).</li>\n    <li>In case of possible\
+        \ REDIRECT or DECOUPLED authentication approach, one or two call-back URLs\
+        \ to be used by the ASPSP at the finalisation of the authentication and consent\
+        \ process :</li>\n    <ul>\n      <li>The first call-back URL will be called\
+        \ by the ASPSP if the Transfer Request is processed without any error or rejection\
+        \ by the PSU</li>\n      <li>The second call-back URL is to be used by the\
+        \ ASPSP in case of processing error or rejection by the PSU. Since this second\
+        \ URL is optional, the PISP might not provide it. In this case, the ASPSP\
+        \ will use the same URL for any processing result.</li>\n      <li>Both call-back\
+        \ URLS must be used in a TLS-secured request, including mutual authentication\
+        \ based on each party’s TLS certificate.</li>\n    </ul>\n    <li>In case\
+        \ of possible \"EMBEDDED\" or \"DECOUPLED\" approaches, a PSU identifier that\
+        \ can be processed by the ASPSP for PSU recognition.</li>\n  </ul>\n  <li>The\
+        \ ASPSP saves the updated Payment/Transfer Request and answers to the PISP.\
+        \ The answer embeds </li>\n  <ul>\n    <li>The specification of the chosen\
+        \ authentication approach taking into account both the PISP and the PSU capabilities.</li>\n\
+        \    <li>In case of chosen REDIRECT authentication approach, the URL to be\
+        \ used by the PISP for redirecting the PSU in order to perform an authentication.</li>\n\
+        \  </ul>\n</ul>\n<h3>Authentication flows for both use cases</h3>\n<h4>Redirect\
+        \ authentication approach </h4>\nWhen the chosen authentication approach within\
+        \ the ASPSP answers is set to \"REDIRECT\":<br>\n<ul>\n  <li>The PISP redirects\
+        \ the PSU to the ASPSP which authenticates the PSU </li>\n  <li>The ASPSP\
+        \ asks the PSU to give (or deny) his/her consent to the Payment Request</li>\n\
+        \  <li>The PSU chooses or confirms which of his/her accounts shall be used\
+        \ by the ASPSP for the future Credit Transfer.</li>\n  <li>The ASPSP is then\
+        \ able to initiate the subsequent Credit Transfer</li>\n  <li>The ASPSP redirects\
+        \ the PSU to the PISP using one of the call-back URLs provided within the\
+        \ posted Payment Request</li>\n</ul>\nIf the PSU neither gives nor denies\
+        \ his/her consent, the Payment Request shall expire and is then rejected to\
+        \ the PISP. The expiration delay is specified by each ASPSP.<br>\n<h4>Decoupled\
+        \ authentication approach</h4>\nWhen the chosen authentication approach is\
+        \ \"DECOUPLED\":<br>\n<ul>\n  <li>Based on the PSU identifier provided within\
+        \ the Payment Request by the PISP, the ASPSP gives the PSU with the Payment\
+        \ Request details and challenges the PSU for a Strong Customer Authentication\
+        \ on a decoupled device or application.</li>\n  <li>The PSU chooses or confirms\
+        \ which of his/her accounts shall be used by the ASPSP for the future Credit\
+        \ Transfer.</li>\n  <li>The ASPSP is then able to initiate the subsequent\
+        \ Credit Transfer</li>\n  <li>The ASPSP notifies the PISP about the finalisation\
+        \ of the authentication and consent process by using one of the call-back\
+        \ URLs provided within the posted Payment Request</li>\n</ul>\nIf the PSU\
+        \ neither gives nor denies his/her consent, the Payment Request shall expire\
+        \ and is then rejected to the PISP. The expiration delay is specified by each\
+        \ ASPSP.<br>\n<h4>Embedded authentication approach</h4>\nWhen the chosen authentication\
+        \ approach within the ASPSP answers is set to \"EMBEDDED\":<br>\n<ul>\n  <li>The\
+        \ TPP informs the PSU that a challenge is needed for completing the Payment\
+        \ Request processing. This challenge will be one of the following:</li>\n\
+        \  <ul>\n    <li>A One-Time-Password sent by the ASPSP to the PSU on a separate\
+        \ device or application.</li>\n    <li>A response computed by a specific device\
+        \ on base of a challenge sent by the ASPSP to the PSU on a separate device\
+        \ or application.</li>\n  </ul>\n  <li>The PSU unlock the device or application\
+        \ through a \"knowledge factor\" and/or an \"inherence factor\" (biometric),\
+        \ retrieves the Payment Request details and processes the data sent by the\
+        \ ASPSP; </li>\n  <li>The PSU might choose or confirm which of his/her accounts\
+        \ shall be used by the ASPSP for the future Credit Transfer when the device\
+        \ or application allows it.</li>\n  <li>When agreeing the Payment Request,\
+        \ the PSU enters the resulting authentication factor through the PISP interface\
+        \ which will forward it to the ASPSP through a confirmation request (cf. §\
+        \ 4.7)</li>\n</ul>\nCase of the PSU neither gives nor denies his/her consent,\
+        \ the Payment Request shall expire and is then rejected to the PISP. The expiration\
+        \ delay is specified by each ASPSP.<br>\n"
+      operationId: "paymentRequestPut"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "paymentRequestResourceId"
+        in: "path"
+        description: "Identification of the Payment Request Resource"
+        required: true
+        type: "string"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      - in: "body"
+        name: "paymentRequest"
+        description: "ISO20022 based payment Initiation Request"
+        required: true
+        schema:
+          $ref: "#/definitions/PaymentRequestResource"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "The modification request has been saved. The ASPSP must authenticate\
+            \ the PSU before committing the update."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+            Digest:
+              type: "string"
+              description: "Digest of the body"
+            Signature:
+              type: "string"
+              description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+                The keyId must specify the way to get the relevant qualified certificate.\
+                \ It is requested that this identifier is an URL aiming to provide\
+                \ the relevant Qualified Certificate.\n"
+          schema:
+            $ref: "#/definitions/HalPaymentRequestCreation"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        404:
+          description: "Not found, no request available."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - clientCredentials:
+        - "pisp"
+  /payment-requests/{paymentRequestResourceId}/confirmation:
+    post:
+      tags:
+      - "PISP"
+      summary: "Confirmation of a payment request or a modification request (PISP)"
+      description: "<h3>Description</h3>\n  The PISP confirms one of the following\
+        \ requests<br>\n  <ul>\n    <li>payment request on behalf of a merchant</li>\n\
+        \    <li>transfer request on behalf of the account's owner</li>\n    <li>standing-order\
+        \ request on behalf of the account's owner</li>\n  </ul>\n  The ASPSP answers\
+        \ with a status of the relevant request and the subsequent Credit Transfer.\n\
+        <h3>Prerequisites</h3>\n  <ul>\n    <li> The TPP has been registered by the\
+        \ Registration Authority for the PISP role</li>\n    <li> The TPP was provided\
+        \ with an OAUTH2 \"Client Credential\" access token by the ASPSP (cf. § 3.4.3).</li>\n\
+        \    <li> The TPP has previously posted a Request which has been saved by\
+        \ the ASPSP (cf. § 4.5.3)</li>\n    <ul>\n      <li>The ASPSP has answered\
+        \ with a location link to the saved Payment Request (cf. § 4.5.4)</li>\n \
+        \     <li> The TPP has retrieved the saved request in order to get the relevant\
+        \ resource Ids (cf. § 4.6).</li>\n    </ul>\n    <li> The TPP and the ASPSP\
+        \ have successfully processed a mutual check and authentication </li>\n  \
+        \  <li> The TPP has presented its \"OAUTH2 Client Credential\" access token\
+        \ </li>\n  </ul>\n<h3>Business flow</h3>\n  Once the PSU has been authenticated,\
+        \ it is the due to the PISP to confirm the Request to the ASPSP in order to\
+        \ complete the process flow.<br>\n  In REDIRECT and DECOUPLED approach, this\
+        \ confirmation is not a prerequisite to the execution of the Credit Transfer.<br>\n"
+      operationId: "paymentRequestConfirmationPost"
+      produces:
+      - "application/hal+json; charset=utf-8"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        description: "Access token to be passed as a header"
+        required: true
+        type: "string"
+      - name: "paymentRequestResourceId"
+        in: "path"
+        description: "Identification of the Payment Request Resource"
+        required: true
+        type: "string"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      - in: "body"
+        name: "confirmationRequest"
+        description: "parameters needed for confirmation of the Payment Request, especially\
+          \ in EMBEDDED approach"
+        required: false
+        schema:
+          $ref: "#/definitions/ConfirmationResource"
+      - name: "PSU-IP-Address"
+        in: "header"
+        description: "IP address used by the PSU's terminal when connecting to the\
+          \ TPP"
+        required: false
+        type: "string"
+      - name: "PSU-IP-Port"
+        in: "header"
+        description: "IP port used by the PSU's terminal when connecting to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-HTTP-Method"
+        in: "header"
+        description: "Http method for the most relevant PSU’s terminal request to\
+          \ the TTP"
+        required: false
+        type: "string"
+      - name: "PSU-Date"
+        in: "header"
+        description: "Timestamp of the most relevant PSU’s terminal request to the\
+          \ TTP"
+        required: false
+        type: "string"
+      - name: "PSU-GEO-Location"
+        in: "header"
+        description: "Geographical location of the PSU as provided by the PSU mobile\
+          \ terminal if any to the TPP"
+        required: false
+        type: "string"
+      - name: "PSU-User-Agent"
+        in: "header"
+        description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Referer"
+        in: "header"
+        description: "\"Referer\" header field sent by the PSU terminal when connecting\
+          \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"\
+          referer\" (incorrect spelling) is to be used. The correct spelling \"referrer\"\
+          \ can be used but might not be understood.\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept"
+        in: "header"
+        description: "\"Accept\" header field sent by the PSU terminal when connecting\
+          \ to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Charset"
+        in: "header"
+        description: "\"Accept-Charset\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Encoding"
+        in: "header"
+        description: "\"Accept-Encoding\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Accept-Language"
+        in: "header"
+        description: "\"Accept-Language\" header field sent by the PSU terminal when\
+          \ connecting to the TPP\n"
+        required: false
+        type: "string"
+      - name: "PSU-Device-ID"
+        in: "header"
+        description: "UUID (Universally Unique Identifier) for a device, which is\
+          \ used by the PSU, if available.\nUUID identifies either a device or a device\
+          \ dependant application installation.\nIn case of installation identification\
+          \ this ID need to be unaltered until removal from device.\n"
+        required: false
+        type: "string"
+      - name: "Digest"
+        in: "header"
+        description: "Digest of the body"
+        required: false
+        type: "string"
+      - name: "Signature"
+        in: "header"
+        description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+          The keyId must specify the way to get the relevant qualified certificate.\
+          \ It is requested that this identifier is an URL aiming to provide the relevant\
+          \ Qualified Certificate.\n"
+        required: true
+        type: "string"
+      - name: "X-Request-ID"
+        in: "header"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+        required: true
+        type: "string"
+        maxLength: 70
+      responses:
+        200:
+          description: "retrieval of the Payment Request enriched with the status\
+            \ report"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+            Digest:
+              type: "string"
+              description: "Digest of the body"
+            Signature:
+              type: "string"
+              description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+                The keyId must specify the way to get the relevant qualified certificate.\
+                \ It is requested that this identifier is an URL aiming to provide\
+                \ the relevant Qualified Certificate.\n"
+          schema:
+            $ref: "#/definitions/HalPaymentRequest"
+        400:
+          description: "Invalid status value"
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        401:
+          description: "Unauthorized, authentication failure."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        403:
+          description: "Forbidden, authentication successful but access to resource\
+            \ is not allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        405:
+          description: "Method Not Allowed."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        406:
+          description: "Not Acceptable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        408:
+          description: "Request Timeout."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        429:
+          description: "Too many requests."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        500:
+          description: "Internal server error."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+        503:
+          description: "Service unavailable."
+          headers:
+            X-Request-ID:
+              type: "string"
+              description: "Correlation header to be set in a request and retrieved\
+                \ in the relevant response\n"
+          schema:
+            $ref: "#/definitions/ErrorModel"
+      security:
+      - clientCredentials:
+        - "pisp"
+securityDefinitions:
+  accessCode:
+    description: "In order to access the PSU's account information, the AISP needs\
+      \ to get aither an authorization code grant or a resource owner password OAUTH2\
+      \ token.\nThe client_id field within the token request must be filled with the\
+      \ value of the organization identifier attribute that has been set in the distinguished\
+      \ name of eIDAS certificate of the TPP, according to ETSI recommandations. \n\
+      (cf §5.2.1 of https://docbox.etsi.org/ESI/Open/Latest_Drafts/ts_119495v000003_for-public-review.pdf)\n"
+    type: "oauth2"
+    authorizationUrl: "https://oauth2.aspsp/authorization"
+    tokenUrl: "https://oauth2.aspsp/token"
+    flow: "accessCode"
+    scopes:
+      aisp: "Access by an AISP to one given PSU's account"
+      piisp: "Access by a PIISP to one given PSU's account to check payment coverage"
+      extended_transaction_history: "Access by an AISP to a transaction history over\
+        \ more than the 90 last days"
+  resourceOwnerIdentification:
+    description: "In order to access the PSU's account information, the AISP needs\
+      \ to get aither an authorization code grant or a resource owner password OAUTH2\
+      \ token.\nThe client_id field within the token request must be filled with the\
+      \ value of the organization identifier attribute that has been set in the distinguished\
+      \ name of eIDAS certificate of the TPP, according to ETSI recommandations. \n\
+      (cf §5.2.1 of https://docbox.etsi.org/ESI/Open/Latest_Drafts/ts_119495v000003_for-public-review.pdf)\n"
+    type: "oauth2"
+    tokenUrl: "https://oauth2.aspsp/token"
+    flow: "password"
+    scopes:
+      aisp: "Access by an AISP to one given PSU's account"
+      piisp: "Access by a PIISP to one given PSU's account to check payment coverage"
+      extended_transaction_history: "Access by an AISP to a transaction history over\
+        \ more than the 90 last days"
+  clientCredentials:
+    description: "In order to post a Payment or Transfer Request, the PISP needs to\
+      \ get an client credential OAUTH2 token. \nThe client_id field within the token\
+      \ request must be filled with the value of the organization identifier attribute\
+      \ that has been set in the distinguished name of eIDAS certificate of the TPP,\
+      \ according to ETSI recommandations. \n(cf §5.2.1 of https://docbox.etsi.org/ESI/Open/Latest_Drafts/ts_119495v000003_for-public-review.pdf)\n"
+    type: "oauth2"
+    tokenUrl: "https://oauth2.aspsp/token"
+    flow: "application"
+    scopes:
+      pisp: "Access by a PISP to payments resources"
+      piisp: "Access by a PIISP to one given PSU's account to check payment coverage"
+definitions:
+  ErrorModel:
+    type: "object"
+    required:
+    - "message"
+    - "status"
+    properties:
+      timestamp:
+        type: "string"
+        format: "date-time"
+        description: "current timestamp"
+      status:
+        type: "integer"
+        format: "int32"
+        description: "HTTP error code"
+      error:
+        type: "string"
+        description: "HTTP error text"
+        maxLength: 140
+      message:
+        type: "string"
+        description: "HTTP textual reason phrase"
+        maxLength: 140
+      path:
+        type: "string"
+        description: "Relevant path that was used"
+        maxLength: 140
+    description: "Generic error report structure"
+    example:
+      timestamp: "2018-03-30T16:06:27.499+0000"
+      status: 400
+      error: "Bad Request"
+      message: "Missing request header 'Digest' for method parameter of type String"
+      path: "/v1/accounts"
+  GenericLink:
+    type: "object"
+    required:
+    - "href"
+    properties:
+      href:
+        type: "string"
+        description: "URI to be used"
+        maxLength: 140
+      templated:
+        type: "boolean"
+        description: "specifies \"true\" if href is a URI template, i.e. with parameters.\
+          \ Otherwise, this property is absent or set to false"
+    description: "hypertext reference"
+    example:
+      href: "v1/accounts/Alias1/balances"
+  PsuContextLinks:
+    type: "object"
+    required:
+    - "self"
+    properties:
+      self:
+        $ref: "#/definitions/GenericLink"
+      beneficiaries:
+        $ref: "#/definitions/GenericLink"
+      first:
+        $ref: "#/definitions/GenericLink"
+      last:
+        $ref: "#/definitions/GenericLink"
+      next:
+        $ref: "#/definitions/GenericLink"
+      prev:
+        $ref: "#/definitions/GenericLink"
+    description: "Links that can be used for further navigation when browsing Account\
+      \ Information at top level\n- self: link to the list of all available accounts\n"
+    example:
+      self:
+        href: "v1/accounts?page=2"
+      first:
+        href: "v1/accounts"
+      last:
+        href: "v1/accounts?page=last"
+        templated: true
+      next:
+        href: "v1/accounts?page=3"
+        templated: true
+      prev:
+        href: "v1/accounts"
+        templated: true
+  AccountLinks:
+    type: "object"
+    properties:
+      balances:
+        $ref: "#/definitions/GenericLink"
+      transactions:
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation when browsing Account\
+      \ Information at one account level\n- balances: link to the balances of a given\
+      \ account\n- transactions: link to the transactions of a given account\n"
+    example:
+      balances:
+        href: "v1/accounts/Alias1/balances-report"
+      transactions:
+        href: "v1/accounts/Alias1/transactions"
+  BalancesLinks:
+    type: "object"
+    required:
+    - "self"
+    properties:
+      self:
+        $ref: "#/definitions/GenericLink"
+      parent-list:
+        $ref: "#/definitions/GenericLink"
+      transactions:
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation when browsing Account\
+      \ Information at one account level\n- self: link to the balances of a given\
+      \ account\n- parent-list: link to the list of all available accounts\n- transactions:\
+      \ link to the transactions of a given account\n"
+    example:
+      self:
+        href: "v1/accounts/Alias1/balances-report"
+      parent-list:
+        href: "v1/accounts"
+      transactions:
+        href: "v1/accounts/Alias1/transactions"
+  TransactionsLinks:
+    type: "object"
+    required:
+    - "self"
+    properties:
+      self:
+        $ref: "#/definitions/GenericLink"
+      parent-list:
+        $ref: "#/definitions/GenericLink"
+      balances:
+        $ref: "#/definitions/GenericLink"
+      first:
+        $ref: "#/definitions/GenericLink"
+      last:
+        $ref: "#/definitions/GenericLink"
+      next:
+        $ref: "#/definitions/GenericLink"
+      prev:
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation when browsing Account\
+      \ Information at one account level\n- self: link to the transactions of a given\
+      \ account\n- parent-list: link to the list of all available accounts\n- balances:\
+      \ link to the balances of a given account\n- first: link to the first page of\
+      \ the transactions result\n- last: link to the last page of the transactions\
+      \ result\n- next: link to the next page of the transactions result\n- prev:\
+      \ link to the previous page of the transactions result\n"
+    example:
+      self:
+        href: "v1/accounts/Alias1/transactions"
+      parent-list:
+        href: "v1/accounts"
+      balances:
+        href: "v1/accounts/Alias1/balances"
+      last:
+        href: "v1/accounts/sAlias1/transactions?page=last"
+      next:
+        href: "v1/accounts/Alias1/transactions?page=3"
+  BeneficiariesLinks:
+    type: "object"
+    required:
+    - "self"
+    properties:
+      self:
+        $ref: "#/definitions/GenericLink"
+      parent-list:
+        $ref: "#/definitions/GenericLink"
+      first:
+        $ref: "#/definitions/GenericLink"
+      last:
+        $ref: "#/definitions/GenericLink"
+      next:
+        $ref: "#/definitions/GenericLink"
+      prev:
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation when browsing Account\
+      \ Information at one account level\n- self: link to the beneficiaries\n- parent-list:\
+      \ link to the list of all available accounts\n- first: link to the first page\
+      \ of the beneficiaries result\n- last: link to the last page of the beneficiaries\
+      \ result\n- next: link to the next page of the beneficiaries result\n- prev:\
+      \ link to the previous page of the beneficiaries result\n"
+    example:
+      self:
+        href: "v1/beneficiaries"
+      parent-list:
+        href: "v1/accounts"
+      last:
+        href: "v1/beneficiaries?page=last"
+      next:
+        href: "v1/beneficiaries?page=3"
+  PaymentRequestLinks:
+    type: "object"
+    properties:
+      self:
+        $ref: "#/definitions/GenericLink"
+      confirmation:
+        description: "This link shall not been provided when the confirmation has\
+          \ already been posted.\n"
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation when having post a\
+      \ Payment Request in order to get the relevant status report.\n"
+    example:
+      self:
+        href: "v1/payments/paymentReport/MyPmtInfRscId"
+      confirmation:
+        href: "v1/payments/paymentReport/MyPmtInfRscId:confirmation"
+  PaymentCoverageReportLinks:
+    type: "object"
+    required:
+    - "self"
+    properties:
+      self:
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation to post another coverage\
+      \ request.\n"
+    example:
+      self:
+        href: "v1/funds-confirmations"
+  PaymentRequestResourceCreationLinks:
+    type: "object"
+    properties:
+      consentApproval:
+        description: "URL to be used by the PISP in order to start the ASPSP authentication\
+          \ and consent management process"
+        $ref: "#/definitions/GenericLink"
+    description: "links that can be used for further navigation, especially in REDIRECT\
+      \ approach \n"
+    example:
+      consentApproval:
+        href: "https://psd2.aspsp/consent-approval"
+  AppliedAuthenticationApproach:
+    type: "string"
+    description: "The ASPSP, based on the authentication approaches proposed by the\
+      \ PISP, choose the one that it can processed, in respect with the preferences\
+      \ and constraints of the PSU and indicates in this field which approach has\
+      \ been chosen\n"
+    example:
+      appliedAuthenticationApproach: "REDIRECT"
+    enum:
+    - "REDIRECT"
+    - "DECOUPLED"
+    - "EMBEDDED"
+  GenericIdentification:
+    type: "object"
+    required:
+    - "identification"
+    - "schemeName"
+    properties:
+      identification:
+        type: "string"
+        description: "API: Identifier\n"
+        maxLength: 70
+      schemeName:
+        type: "string"
+        description: "Name of the identification scheme.\nPossible values for the\
+          \ scheme name, partially based on ISO20022 external code list, are the following:\
+          \ \n- BANK (BankPartyIdentification): Unique and unambiguous assignment\
+          \ made by a specific bank or similar financial institution to identify a\
+          \ relationship as defined between the bank and its client. \n- COID (CountryIdentificationCode)\
+          \ : Country authority given organisation identification (e.g., corporate\
+          \ registration number)\n- SREN (SIREN): The SIREN number is a 9 digit code\
+          \ assigned by INSEE, the French National Institute for Statistics and Economic\
+          \ Studies, to identify an organisation in France.\n- SRET (SIRET): The SIRET\
+          \ number is a 14 digit code assigned by INSEE, the French National Institute\
+          \ for Statistics and Economic Studies, to identify an organisation unit\
+          \ in France. It consists of the SIREN number, followed by a five digit classification\
+          \ number, to identify the local geographical unit of that entity.\n- NIDN\
+          \ (NationalIdentityNumber): Number assigned by an authority to identify\
+          \ the national identity number of a person.\nOther values are also permitted,\
+          \ for instance:\n- OAUT (OAUTH2): OAUTH2 access token that is owned by the\
+          \ PISP being also an AISP and that can be used in order to identify the\
+          \ PSU\n- CPAN (CardPan): Card PAN\n"
+        maxLength: 70
+      issuer:
+        type: "string"
+        description: "ISO20022: Entity that assigns the identification. this could\
+          \ a country code or any organisation name or identifier that can be recognized\
+          \ by both parties\n"
+        maxLength: 35
+    description: "ISO20022: Unique identification of an account, a person or an organisation,\
+      \ as assigned by an issuer.\nAPI: The ASPSP will document which account reference\
+      \ type it will support.\n"
+    example:
+      identification: "12FR5"
+      schemeName: "COID"
+      issuer: "FR"
+  AccountIdentification:
+    type: "object"
+    properties:
+      iban:
+        type: "string"
+        description: "ISO20022: International Bank Account Number (IBAN) - identification\
+          \ used internationally by financial institutions to uniquely identify the\
+          \ account of a customer. \n\nFurther specifications of the format and content\
+          \ of the IBAN can be found in the standard ISO 13616 \"Banking and related\
+          \ financial services - International Bank Account Number (IBAN)\" version\
+          \ 1997-10-01, or later revisions.\n"
+        pattern: "^[A-Z]{2,2}[0-9]{2,2}[a-zA-Z0-9]{1,30}$"
+      other:
+        $ref: "#/definitions/GenericIdentification"
+    description: "Unique and unambiguous identification for the account between the\
+      \ account owner and the account servicer."
+    example:
+      Iban: "YY64COJH41059545330222956960771321"
+  AmountType:
+    type: "object"
+    required:
+    - "amount"
+    - "currency"
+    properties:
+      currency:
+        type: "string"
+        description: "Specifies the currency of the amount. A code allocated to a\
+          \ currency by a Maintenance Agency under an international identification\
+          \ scheme, as described in the latest edition of the international standard\
+          \ ISO 4217 \"Codes for the representation of currencies and funds\". \n"
+        pattern: "^[A-Z]{3,3}$"
+      amount:
+        type: "string"
+        description: "ISO20022: Amount of money to be moved between the debtor and\
+          \ creditor, before deduction of charges, expressed in the currency as ordered\
+          \ by the initiating party.\n"
+        pattern: "^\\-{0,1}[0-9]{1,13}(\\.[0-9]{0,5}){0,1}$"
+    description: "ISO20022: structure aiming to carry either an instructed amount\
+      \ or equivalent amount. Both structures embed the amount and the currency to\
+      \ be used.\n\nAPI: only instructed amount can be used\n"
+    example:
+      currency: "EUR"
+      amount: "12.25"
+  ClearingSystemMemberIdentification:
+    type: "object"
+    properties:
+      clearingSystemId:
+        type: "string"
+        description: "ISO20022: Specification of a pre-agreed offering between clearing\
+          \ agents or the channel through which the payment instruction is processed.\n"
+        maxLength: 35
+      memberId:
+        type: "string"
+        description: "ISO20022: Identification of a member of a clearing system.\n"
+        maxLength: 35
+    description: "ISO20022: Information used to identify a member within a clearing\
+      \ system.\nAPI: to be used for some specific international credit transfers\
+      \ in order to identify the beneficiary bank\n"
+    example: "{\n  \"clearingSystemId\" : \"NZNCC\",\n  \"memberId\" : \"020368\"\n\
+      }  \n"
+  FinancialInstitutionIdentification:
+    type: "object"
+    required:
+    - "bicFi"
+    properties:
+      bicFi:
+        type: "string"
+        description: "ISO20022: Code allocated to a financial institution by the ISO\
+          \ 9362 Registration Authority as described in ISO 9362 \"Banking - Banking\
+          \ telecommunication messages - Business identification code (BIC)\".\n"
+        pattern: "^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$"
+      clearingSystemMemberId:
+        $ref: "#/definitions/ClearingSystemMemberIdentification"
+      name:
+        type: "string"
+        description: "Name of the financial institution"
+        maxLength: 140
+      postalAddress:
+        $ref: "#/definitions/PostalAddress"
+    description: "ISO20022: Unique and unambiguous identification of a financial institution,\
+      \ as assigned under an internationally recognised or proprietary identification\
+      \ scheme.\n"
+    example:
+      bicFi: "BNKAFRPPXXX"
+  PostalAddress:
+    type: "object"
+    required:
+    - "addressLine"
+    - "country"
+    properties:
+      country:
+        type: "string"
+        description: "ISO20022: Country in which a person resides (the place of a\
+          \ person's home). In the case of a company, it is the country from which\
+          \ the affairs of that company are directed.\n"
+        pattern: "^([A-Z]{2,2})$"
+      addressLine:
+        type: "array"
+        description: "Unstructured address. The two lines must embed zip code and\
+          \ town name"
+        items:
+          type: "string"
+          description: "Address line"
+          maxLength: 70
+    description: "ISO20022 : Information that locates and identifies a specific address,\
+      \ as defined by postal services.\n"
+    example:
+      country: "FR"
+      addressLine:
+      - "18 rue de la DSP2"
+      - "75008 PARIS"
+  PartyIdentification:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+        description: "ISO20022: Name by which a party is known and which is usually\
+          \ used to identify that party.\n"
+        maxLength: 140
+      postalAddress:
+        $ref: "#/definitions/PostalAddress"
+      organisationId:
+        description: "Unique and unambiguous way to identify an organisation."
+        $ref: "#/definitions/GenericIdentification"
+      privateId:
+        description: "Unique and unambiguous identification of a person."
+        $ref: "#/definitions/GenericIdentification"
+    description: "API : Description of a Party which can be either a person or an\
+      \ organization.\n"
+    example:
+      name: "MyPreferedPisp"
+      postalAddress:
+        country: "FR"
+        addressLine:
+        - "18 rue de la DSP2"
+        - "75008 PARIS"
+  ResourceId:
+    type: "string"
+    pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+    description: "API: Identifier assigned by the ASPSP for further use of the created\
+      \ resource through API calls\n"
+  PaymentIdentification:
+    type: "object"
+    required:
+    - "endToEndId"
+    - "instructionId"
+    properties:
+      resourceId:
+        $ref: "#/definitions/ResourceId"
+      instructionId:
+        type: "string"
+        description: "ISO20022: Unique identification as assigned by an instructing\
+          \ party for an instructed party to unambiguously identify the instruction.\n\
+          \nAPI: Unique identification shared between the PISP and the ASPSP \n"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      endToEndId:
+        type: "string"
+        description: "ISO20022: Unique identification assigned by the initiating party\
+          \ to unambiguously identify the transaction. This identification is passed\
+          \ on, unchanged, throughout the entire end-to-end chain.\n\nAPI: Unique\
+          \ identification shared between the merchant and the PSU\n"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+    description: "ISO20022: Set of elements used to reference a payment instruction.\n"
+    example:
+      resourceId: "MyInstrRscId"
+      instructionId: "MyInstrId"
+      endToEndId: "MyEndToEndId"
+  PriorityCode:
+    type: "string"
+    description: "ISO20022: Indicator of the urgency or order of importance that the\
+      \ instructing party would like the instructed party to apply to the processing\
+      \ of the instruction.\n"
+    enum:
+    - "HIGH"
+    - "NORM"
+  CategoryPurposeCode:
+    type: "string"
+    description: "ISO20022: Specifies the high level purpose of the instruction based\
+      \ on a set of pre-defined categories. This is used by the initiating party to\
+      \ provide information concerning the processing of the payment. It is likely\
+      \ to trigger special processing by any of the agents involved in the payment\
+      \ chain.\nAPI: The following values are allowed:\n  - CASH (CashManagementTransfer):\
+      \ Transaction is a general cash management instruction.\n  - DVPM (DeliverAgainstPayment):\
+      \ Code used to pre-advise the account servicer of a forthcoming deliver against\
+      \ payment instruction.  \n"
+    enum:
+    - "CASH"
+    - "DVPM"
+  ServiceLevelCode:
+    type: "string"
+    description: "ISO20022: Agreement under which or rules under which the transaction\
+      \ should be processed. Specifies a pre-agreed service or level of service between\
+      \ the parties, as published in an external service level code list.\nAPI: Only\
+      \ \"SEPA\" (SEPA Credit Transfer) or \"NURG\" (Other Credit Transfer) values\
+      \ are allowed\n"
+    enum:
+    - "NURG"
+    - "SEPA"
+  LocalInstrumentCode:
+    type: "string"
+    description: "ISO20022: User community specific instrument. \nUsage: This element\
+      \ is used to specify a local instrument, local clearing option and/or further\
+      \ qualify the service or service level.\nAPI: Only \"INST\" value is allowed\
+      \ in order to ask for an SEPA instant Payment. Can only be used if ServiceLevel\
+      \ is equal to \"SEPA\"\n"
+    enum:
+    - "INST"
+  PaymentTypeInformation:
+    type: "object"
+    required:
+    - "serviceLevel"
+    properties:
+      instructionPriority:
+        $ref: "#/definitions/PriorityCode"
+      serviceLevel:
+        $ref: "#/definitions/ServiceLevelCode"
+      localInstrument:
+        $ref: "#/definitions/LocalInstrumentCode"
+      categoryPurpose:
+        $ref: "#/definitions/CategoryPurposeCode"
+    description: "ISO20022: Set of elements used to further specify the type of transaction.\n"
+    example:
+      instructionPriority: "HIGH"
+      serviceLevel: "SEPA"
+      localInstrument: "INST"
+      categoryPurpose: "DVPM"
+  PurposeCode:
+    type: "string"
+    description: "ISO20022: Underlying reason for the payment transaction, as published\
+      \ in an external purpose code list.    \nAPI: The following values are allowed\
+      \ for Payment  Request\n  - ACCT (Funds moved between 2 accounts of same account\
+      \ holder at the same bank) \n  - CASH (general cash management instruction)\
+      \ may be used for Transfer Initiation\n  - COMC Transaction is related to a\
+      \ payment of commercial credit or debit.\n  - CPKC General Carpark Charges Transaction\
+      \ is related to carpark charges.\n  - TRPT Transport RoadPricing Transaction\
+      \ is for the payment to top-up pre-paid card and electronic road pricing for\
+      \ the purpose of transportation\n"
+    enum:
+    - "ACCT"
+    - "CASH"
+    - "COMC"
+    - "CPKC"
+    - "TRPT"
+  ChargeBearerCode:
+    type: "string"
+    description: "ISO20022: Specifies which party/parties will bear the charges associated\
+      \ with the processing of the payment transaction.    \nAPI: The following values\
+      \ are allowed for Payment  Request\n  - SLEV:  Charges are to be applied following\
+      \ the rules agreed in the service level and/or scheme.\n"
+    enum:
+    - "SLEV"
+  UnstructuredRemittanceInformation:
+    type: "array"
+    description: "ISO20022: Information supplied to enable the matching of an entry\
+      \ with the items that the transfer is intended to settle, such as commercial\
+      \ invoices in an accounts' receivable system.\nAPI: Only one occurrence is allowed\n"
+    items:
+      type: "string"
+      description: "Relevant information to the transaction"
+      title: "remittanceLine"
+      maxLength: 140
+  PaymentInformationStatusCode:
+    type: "string"
+    description: "ISO20022: Specifies the status of the payment information.\nAPI:\
+      \ Mandatory. The following values are allowed to provide the status of the Payment\
+      \ Request \n  - ACCP (AcceptedCustomerProfile): Preceding check of technical\
+      \ validation was successful. Customer profile check was also successful. \n\
+      \  - ACSC (AcceptedSettlementCompleted): Settlement on the debtor's account\
+      \ has been completed.\n  - ACSP (AcceptedSettlementInProcess): All preceding\
+      \ checks such as technical validation and customer profile were successful.\
+      \ Dynamic risk assessment is now also successful and therefore the Payment Request\
+      \ has been accepted for execution.\n  - ACTC (AcceptedTechnicalValidation):\
+      \ Authentication and syntactical and semantical validation are successful.\n\
+      \  - ACWC (AcceptedWithChange): Instruction is accepted but a change will be\
+      \ made, such as date or remittance not sent. \n  - ACWP (AcceptedWithoutPosting):\
+      \ Payment instruction included in the credit transfer is accepted without being\
+      \ posted to the creditor customer’s account.\n  - PART (PartiallyAccepted):\
+      \ A number of transactions have been accepted, whereas another number of transactions\
+      \ have not yet achieved 'accepted' status. \n  - RCVD (Received): Payment initiation\
+      \ has been received by the receiving agent.\n  - PDNG (Pending): Payment request\
+      \ or individual transaction included in the Payment Request is pending. Further\
+      \ checks and status update will be performed.\n  - RJCT (Rejected): Payment\
+      \ request  has been rejected.\n  \n"
+    enum:
+    - "ACCP"
+    - "ACSC"
+    - "ACSP"
+    - "ACTC"
+    - "ACWC"
+    - "ACWP"
+    - "PART"
+    - "RCVD"
+    - "PDNG"
+    - "RJCT"
+  TransactionIndividualStatusCode:
+    type: "string"
+    description: "ISO20022: Specifies the status of the payment information group.\n\
+      \nAPI: Only the following values are allowed to provide the status of the subsequent\
+      \ CREDIT TRANSFER to the Payment Request\n- RJCT: Payment request or individual\
+      \ transaction included in the Payment Request has been rejected.\n- PDNG: (Pending):\
+      \ Payment request or individual transaction included in the Payment Request\
+      \ is pending. Further checks and status update will be performed.\n- ACSP: All\
+      \ preceding checks such as technical validation and customer profile were successful\
+      \ and therefore the Payment Request has been accepted for execution.\n- ACSC:\
+      \ Settlement on the debtor's account has been completed\n"
+    enum:
+    - "RJCT"
+    - "PDNG"
+    - "ACSP"
+    - "ACSC"
+  StatusReasonInformation:
+    type: "string"
+    description: "ISO20022: Provides detailed information on the status reason.\n\n\
+      API: Can only be used in status equal to \"RJCT\". Only the following values\
+      \ are allowed:\n- AC01 (IncorectAccountNumber): the account number is either\
+      \ invalid or does not exist\n- AC04 (ClosedAccountNumber): the account is closed\
+      \ and cannot be used\n- AC06 (BlockedAccount): the account is blocked and cannot\
+      \ be used\n- AG01 (Transaction forbidden): Transaction forbidden on this type\
+      \ of account\n- AM18 (InvalidNumberOfTransactions): the number of transactions\
+      \ exceeds the ASPSP acceptance limit\n- CH03 (RequestedExecutionDateOrRequestedCollectionDateTooFarInFuture):\
+      \ The requested execution date is too far in the future\n- CUST (RequestedByCustomer):\
+      \ The reject is due to the debtor: refusal or lack of liquidity\n- DS02 (OrderCancelled):\
+      \ An authorized user has cancelled the order\n- FF01 (InvalidFileFormat): The\
+      \ reject is due to the original Payment Request which is invalid (syntax, structure\
+      \ or values)\n- FRAD (FraudulentOriginated): the Payment Request is considered\
+      \ as fraudulent\n- MS03 (NotSpecifiedReasonAgentGenerated): No reason specified\
+      \ by the ASPSP\n- NOAS (NoAnswerFromCustomer): The PSU has neither accepted\
+      \ nor rejected the Payment Request and a time-out has occurred\n- RR01 (MissingDebtorAccountOrIdentification):\
+      \ The Debtor account and/or Identification are missing or inconsistent \n- RR03\
+      \ (MissingCreditorNameOrAddress): Specification of the creditor’s name and/or\
+      \ address needed for regulatory requirements is insufficient or missing.\n-\
+      \ RR04 (RegulatoryReason): Reject from regulatory reason\n- RR12 (InvalidPartyID):\
+      \ Invalid or missing identification required within a particular country or\
+      \ payment type.\n \n"
+    enum:
+    - "AC01"
+    - "AC04"
+    - "AC06"
+    - "AG01"
+    - "CH03"
+    - "CUST"
+    - "DS02"
+    - "FF01"
+    - "FRAD"
+    - "MS03"
+    - "NOAS"
+    - "RR01"
+    - "RR03"
+    - "RR04"
+    - "RR12"
+  RegulatoryReportingCode:
+    type: "string"
+    maxLength: 10
+    description: "Information needed due to regulatory and statutory requirements.\
+      \ \nEconomical codes to be used are provided by the National Competent Authority\n"
+  RegulatoryReportingCodes:
+    type: "array"
+    description: "List of needed regulatory reporting codes for international payments\n"
+    items:
+      $ref: "#/definitions/RegulatoryReportingCode"
+    minItems: 1
+    maxItems: 10
+  RequestedExecutionDate:
+    type: "string"
+    format: "date-time"
+    description: "ISO20022: Date at which the initiating party requests the clearing\
+      \ agent to process the payment.\nAPI:  \nThis date can be used in the following\
+      \ cases:\n- the single requested execution date for a payment having several\
+      \ instructions. In this case, this field must be set at the payment level. \n\
+      - the requested execution date for a given instruction within a payment. In\
+      \ this case, this field must be set at each instruction level. \n- The first\
+      \ date of execution for a standing order.\nWhen the payment cannot be processed\
+      \ at this date, the ASPSP is allowed to shift the applied execution date to\
+      \ the next possible execution date for non-standing orders.\nFor standing orders,\
+      \ the [executionRule] parameter helps to compute the execution date to be applied.\n"
+  EndDate:
+    type: "string"
+    format: "date-time"
+    description: "The last applicable day of execution for a given standing order.\n\
+      If not given, the standing order is considered as endless.\n"
+  ExecutionRule:
+    type: "string"
+    description: "Execution date shifting rule for standing orders\nThis data attribute\
+      \ defines the behaviour when recurring payment dates falls on a weekend or bank\
+      \ holiday. \nThe payment is then executed either the \"preceding\" or \"following\"\
+      \ working day.\nASPSP might reject the request due to the communicated value,\
+      \ if rules in Online-Banking are not supporting \nthis execution rule.\n- FWNG:\
+      \ following\n- PREC: preceding\n"
+    enum:
+    - "FWNG"
+    - "PREC"
+  FrequencyCode:
+    type: "string"
+    description: "Frequency rule for standing orders.\nThe following codes from the\
+      \ \"EventFrequency7Code\" of ISO 20022 are supported.\n- DAIL: Daily\n- WEEK:\
+      \ Weekly\n- TOWK: EveryTwoWeeks\n- MNTH: Monthly\n- TOMN: EveryTwoMonths\n-\
+      \ QUTR: Quarterly\n- SEMI: SemiAnnual\n- YEAR: Annual\nHowever, each ASPSP might\
+      \ restrict these values into a subset if needed. \n"
+    enum:
+    - "DAIL"
+    - "WEEK"
+    - "TOWK"
+    - "MNTH"
+    - "TOMN"
+    - "QUTR"
+    - "SEMI"
+    - "YEAR"
+  CreditTransferTransaction:
+    type: "object"
+    required:
+    - "instructedAmount"
+    - "paymentId"
+    - "remittanceInformation"
+    properties:
+      paymentId:
+        $ref: "#/definitions/PaymentIdentification"
+      requestedExecutionDate:
+        $ref: "#/definitions/RequestedExecutionDate"
+      endDate:
+        $ref: "#/definitions/EndDate"
+      executionRule:
+        $ref: "#/definitions/ExecutionRule"
+      frequency:
+        $ref: "#/definitions/FrequencyCode"
+      instructedAmount:
+        $ref: "#/definitions/AmountType"
+      beneficiary:
+        $ref: "#/definitions/Beneficiary"
+      ultimateCreditor:
+        $ref: "#/definitions/PartyIdentification"
+      regulatoryReportingCodes:
+        $ref: "#/definitions/RegulatoryReportingCodes"
+      remittanceInformation:
+        $ref: "#/definitions/UnstructuredRemittanceInformation"
+      transactionStatus:
+        $ref: "#/definitions/TransactionIndividualStatusCode"
+      statusReasonInformation:
+        $ref: "#/definitions/StatusReasonInformation"
+    description: "ISO20022: Payment processes required to transfer cash from the debtor\
+      \ to the creditor.\nAPI: \n"
+    example:
+      paymentIdentification:
+        resourceId: "MyInstrRscId"
+        instructionIdentification: "MyInstrId"
+        endToEndIdentification: "MyEndToEndId"
+      requestedExecutionDate: "2016-12-31T00:00:00.000+01:00"
+      instructedAmount:
+        currency: "EUR"
+        amount: "124.35"
+      remittanceInformation:
+      - "MyRemittanceInformation"
+  SupplementaryData:
+    type: "object"
+    properties:
+      acceptedAuthenticationApproach:
+        type: "array"
+        description: "can only be set by the PISP\nauthentication approaches that\
+          \ are supported by the PISP. The PISP can provide several choices separated\
+          \ by commas. \nREDIRECT: the PSU is redirected by the TPP to the ASPSP which\
+          \ processes identification and authentication\nDECOUPLED: the TPP identifies\
+          \ the PSU and forwards the identification to the ASPSP which processes the\
+          \ authentication through a decoupled device\nEMBEDDED: the TPP identifies\
+          \ the PSU and forwards the identification to the ASPSP which starts the\
+          \ authentication. The TPP forwards one authentication factor of the PSU\
+          \ (e.g. OTP or response to a challenge)  \n"
+        items:
+          type: "string"
+          description: "combination of possible values for authentication approaches"
+          enum:
+          - "REDIRECT"
+          - "DECOUPLED"
+          - "EMBEDDED"
+      appliedAuthenticationApproach:
+        $ref: "#/definitions/AppliedAuthenticationApproach"
+      scaHint:
+        type: "string"
+        description: "can only be set by the PISP\nHint given by the merchant and/or\
+          \ the PISP about an SCA exemption context\n"
+        enum:
+        - "noScaExemption"
+        - "scaExemption"
+      successfulReportUrl:
+        type: "string"
+        description: "URL to be used by the ASPSP in order to notify the PISP of the\
+          \ finalisation of the authentication and consent process in REDIRECT and\
+          \ DECOUPLED approach\n"
+      unsuccessfulReportUrl:
+        type: "string"
+        description: "URL to be used by the ASPSP in order to notify the PISP of the\
+          \ failure of the authentication and consent process in REDIRECT and DECOUPLED\
+          \ approach \nIf this URL is not provided by the PISP, the ASPSP will use\
+          \ the \"successfulReportUrl\" even in case of failure of the Payment Request\
+          \ processing\n"
+    description: "ISO20022: Additional information that cannot be captured in the\
+      \ structured elements and/or any other specific block.\n\nAPI: This structure\
+      \ is used to embed the relevant URLs for returning the status report to the\
+      \ PISP and to specify which authentication approaches are accepted by the PISP\
+      \ and which has been chosen by the ASPSP\n"
+    example:
+      successfulReportUrl: "http://myPisp/PaymentSuccess"
+      unsuccessfulReportUrl: "http://myPisp/PaymentFailure"
+  BalanceStatus:
+    type: "string"
+    description: "Type of balance\n- CLBD: (ISO20022 ClosingBooked) Accounting Balance\n\
+      - XPCD: (ISO20022 Expected) Instant Balance\n- VALU: Value-date balance\n- OTHR:\
+      \ Other Balance\n"
+    enum:
+    - "CLBD"
+    - "XPCD"
+    - "VALU"
+    - "OTHR"
+  TransactionStatus:
+    type: "string"
+    description: "Type of Transaction\n- BOOK: (ISO20022 ClosingBooked) Accounted\
+      \ transaction\n- PDNG: (ISO20022 Expected) Instant Balance Transaction\n- OTHR:\
+      \ Other \n"
+    enum:
+    - "BOOK"
+    - "PDNG"
+    - "OTHR"
+  Transaction:
+    type: "object"
+    required:
+    - "bookingDate"
+    - "creditDebitIndicator"
+    - "remittanceInformation"
+    - "status"
+    - "transactionAmount"
+    properties:
+      resourceId:
+        $ref: "#/definitions/ResourceId"
+      entryReference:
+        type: "string"
+        description: "Technical incremental identification of the transaction.\n"
+        maxLength: 40
+      transactionAmount:
+        $ref: "#/definitions/AmountType"
+      creditDebitIndicator:
+        type: "string"
+        description: "Accounting flow of the transaction\n- CRDT: Credit type transaction\n\
+          - DBIT: Debit type transaction\n"
+        enum:
+        - "CRDT"
+        - "DBIT"
+      status:
+        $ref: "#/definitions/TransactionStatus"
+      bookingDate:
+        type: "string"
+        format: "date"
+        description: "Booking date of the transaction on the account"
+      valueDate:
+        type: "string"
+        format: "date"
+        description: "Value date of the transaction on the account"
+      transactionDate:
+        type: "string"
+        format: "date"
+        description: "Date used for specific purposes: \n- for card transaction: date\
+          \ of the transaction\n- for credit transfer: acquiring date of the transaction\n\
+          - for direct debit: receiving date of the transaction\n"
+      remittanceInformation:
+        $ref: "#/definitions/UnstructuredRemittanceInformation"
+    description: "structure of a transaction"
+    example:
+      entryReference: "AF5T2"
+      transactionAmount:
+        currency: "EUR"
+        amount: "12.25"
+      creditDebitIndicator: "CRDT"
+      status: "BOOK"
+      bookingDate: "2018-02-12"
+      remittanceInformation:
+      - "SEPA CREDIT TRANSFER from PSD2Company"
+  AccountResource:
+    type: "object"
+    required:
+    - "_links"
+    - "cashAccountType"
+    - "currency"
+    - "name"
+    properties:
+      resourceId:
+        $ref: "#/definitions/ResourceId"
+      bicFi:
+        type: "string"
+        description: "ISO20022: Code allocated to a financial institution by the ISO\
+          \ 9362 Registration Authority as described in ISO 9362 \"Banking - Banking\
+          \ telecommunication messages - Business identification code (BIC)\".\n"
+        pattern: "^[A-Z]{6,6}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3,3}){0,1}$"
+      accountId:
+        $ref: "#/definitions/AccountIdentification"
+      name:
+        type: "string"
+        description: "Label of the PSU account\nIn case of a delayed debit card transaction\
+          \ set, the name shall specify the holder name and the imputation date\n"
+        maxLength: 70
+      details:
+        type: "string"
+        description: "Specifications that might be provided by the ASPSP\n- characteristics\
+          \ of the account\n- characteristics of the relevant card\n"
+        maxLength: 140
+      linkedAccount:
+        type: "string"
+        description: "Case of a set of pending card transactions, the APSP will provide\
+          \ the relevant cash account the card is set up on."
+        maxLength: 70
+      usage:
+        type: "string"
+        description: "Specifies the usage of the account\n- PRIV: private personal\
+          \ account\n- ORGA: professional account\n"
+        enum:
+        - "PRIV"
+        - "ORGA"
+      cashAccountType:
+        type: "string"
+        description: "Specifies the type of the account\n- CACC: Cash account\n- CARD:\
+          \ List of card based transactions\n"
+        enum:
+        - "CACC"
+        - "CARD"
+      product:
+        type: "string"
+        description: "Product Name of the Bank for this account, proprietary definition\n"
+        maxLength: 35
+      currency:
+        type: "string"
+        description: "Currency used for the account"
+        maxLength: 3
+      balances:
+        type: "array"
+        description: "list of balances provided by the ASPSP"
+        items:
+          $ref: "#/definitions/BalanceResource"
+        minItems: 1
+      psuStatus:
+        type: "string"
+        description: "Relationship between the PSU and the account - Account Holder\
+          \ - Co-account Holder - Attorney"
+        maxLength: 35
+      _links:
+        $ref: "#/definitions/AccountLinks"
+    description: "PSU account that is made available to the TPP\n"
+    example:
+      resourceId: "Alias1"
+      bicFi: "BNKAFRPPXXX"
+      name: "Compte de Mr et Mme Dupont"
+      usage: "PRIV"
+      cashAccountType: "CACC"
+      currency: "EUR"
+      psuStatus: "Co-account Holder"
+      _links:
+        balances:
+          href: "v1/accounts/Alias1/balances"
+        transactions:
+          href: "v1/accounts/Alias1/transactions"
+  BalanceResource:
+    type: "object"
+    required:
+    - "balanceAmount"
+    - "balanceType"
+    - "name"
+    properties:
+      name:
+        type: "string"
+        description: "Label of the balance"
+        maxLength: 70
+      balanceAmount:
+        $ref: "#/definitions/AmountType"
+      balanceType:
+        $ref: "#/definitions/BalanceStatus"
+      lastChangeDateTime:
+        type: "string"
+        format: "date-time"
+        description: "Timestamp of the last change of the balance amount"
+      referenceDate:
+        type: "string"
+        format: "date"
+        description: "Reference date for the balance"
+      lastCommittedTransaction:
+        type: "string"
+        description: "Identification of the last committed transaction. This is actually\
+          \ useful for instant balance.\n"
+        maxLength: 40
+    description: "Structure of an account balance"
+    example:
+      name: "Solde comptable au 12/01/2017"
+      balanceAmount:
+        currency: "EUR"
+        amount: "123.45"
+      balanceType: "CLBD"
+      lastCommittedTransaction: "A452CH"
+  ConfirmationResource:
+    type: "object"
+    properties:
+      psuAuthenticationFactor:
+        type: "string"
+        description: "authentication factor forwarded by the TPP to the ASPSP in order\
+          \ to fulfil the strong customer authentication process"
+    description: "Confirmation request resource"
+    example:
+      psuAuthenticationFactor: "JJKJKJ788GKJKJBK"
+  PaymentInformationId:
+    type: "string"
+    pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+    description: "ISO20022 : Reference assigned by a sending party to unambiguously\
+      \ identify the payment information block within the message.\n"
+  CreationDateTime:
+    type: "string"
+    format: "date-time"
+    description: "ISO20022: Date and time at which a (group of) payment instruction(s)\
+      \ was created by the instructing party.\n"
+  FundsAvailabilityInformation:
+    type: "boolean"
+    description: "indicator that the payment can be covered or not by the funds available\
+      \ on the relevant account\n- true: payment is covered\n- false: payment is not\
+      \ covered\n"
+  BookingInformation:
+    type: "boolean"
+    description: "indicator that the payment can be immediately booked or not\n- true:\
+      \ payment is booked\n- false: payment is not booked\n"
+  PaymentRequestResource:
+    type: "object"
+    required:
+    - "creationDateTime"
+    - "creditTransferTransaction"
+    - "initiatingParty"
+    - "numberOfTransactions"
+    - "paymentInformationId"
+    - "paymentTypeInformation"
+    - "supplementaryData"
+    properties:
+      resourceId:
+        $ref: "#/definitions/ResourceId"
+      paymentInformationId:
+        $ref: "#/definitions/PaymentInformationId"
+      creationDateTime:
+        $ref: "#/definitions/CreationDateTime"
+      numberOfTransactions:
+        type: "integer"
+        description: "ISO20022: Number of individual transactions contained in the\
+          \ message.\nAPI: Each ASPSP will specify a maximum value for this field\
+          \ taking into accounts its specificities about payment request handling\n"
+        minimum: 1
+      initiatingParty:
+        $ref: "#/definitions/PartyIdentification"
+      paymentTypeInformation:
+        $ref: "#/definitions/PaymentTypeInformation"
+      debtor:
+        $ref: "#/definitions/PartyIdentification"
+      debtorAccount:
+        $ref: "#/definitions/AccountIdentification"
+      debtorAgent:
+        $ref: "#/definitions/FinancialInstitutionIdentification"
+      beneficiary:
+        $ref: "#/definitions/Beneficiary"
+      ultimateCreditor:
+        $ref: "#/definitions/PartyIdentification"
+      purpose:
+        $ref: "#/definitions/PurposeCode"
+      chargeBearer:
+        $ref: "#/definitions/ChargeBearerCode"
+      paymentInformationStatus:
+        $ref: "#/definitions/PaymentInformationStatusCode"
+      statusReasonInformation:
+        $ref: "#/definitions/StatusReasonInformation"
+      fundsAvailability:
+        $ref: "#/definitions/FundsAvailabilityInformation"
+      booking:
+        $ref: "#/definitions/BookingInformation"
+      requestedExecutionDate:
+        type: "string"
+        format: "date-time"
+        description: "ISO20022: Date at which the initiating party requests the clearing\
+          \ agent to process the payment. \n"
+      creditTransferTransaction:
+        type: "array"
+        description: "ISO20022: Payment processes required to transfer cash from the\
+          \ debtor to the creditor.\nAPI: Each ASPSP will specify a maxItems value\
+          \ for this field taking into accounts its specificities about payment request\
+          \ handling\n"
+        items:
+          $ref: "#/definitions/CreditTransferTransaction"
+        minItems: 1
+      supplementaryData:
+        $ref: "#/definitions/SupplementaryData"
+    description: "ISO20022: The PaymentRequestResource message is sent by the Creditor\
+      \ sending party to the Debtor receiving party, directly or through agents. It\
+      \ is used by a Creditor to request movement of funds from the debtor account\
+      \ to a creditor.\nAPI: \nInformation about the creditor (Id, account and agent)\
+      \ might be placed either at payment level or at instruction level. Thus multi-beneficiary\
+      \ payments can be handled.\nThe requested execution date can be placed either\
+      \ at payment level when all instructions are requested to be executed at the\
+      \ same date or at instruction level.\nThe latest case includes:\n- multiple\
+      \ instructions having different requested execution dates\n- standing orders\
+      \ settings \n"
+    example:
+      paymentInformationId: "MyPmtInfId"
+      creationDateTime: "2018-03-31T13:25:22.527+02:00"
+      numberOfTransactions: 1
+      initiatingParty:
+        name: "MyPreferedPisp"
+        postalAddress:
+          country: "FR"
+          addressLine:
+          - "18 rue de la DSP2"
+          - "75008 PARIS"
+        organisationId:
+          identification: "12FR5"
+          schemeName: "COID"
+          issuer: "ACPR"
+      paymentTypeInformation:
+        serviceLevel: "SEPA"
+        localInstrument: "INST"
+        categoryPurpose: "DVPM"
+      debtor:
+        name: "MyCustomer"
+        postalAddress:
+          country: "FR"
+          addressLine:
+          - "18 rue de la DSP2"
+          - "75008 PARIS"
+        privateId:
+          identification: "FD37G"
+          schemeName: "BANK"
+          issuer: "BICXYYTTZZZ"
+      creditor:
+        name: "myMerchant"
+        postalAddress:
+          country: "FR"
+          addressLine:
+          - "18 rue de la DSP2"
+          - "75008 PARIS"
+        organisationId:
+          identification: "852126789"
+          schemeName: "SIREN"
+          issuer: "FR"
+      creditorAccount:
+        iban: "YY64COJH41059545330222956960771321"
+      ultimateCreditor:
+        name: "myPreferedUltimateMerchant"
+        postalAddress:
+          country: "FR"
+          addressLine:
+          - "18 rue de la DSP2"
+          - "75008 PARIS"
+        organisationId:
+          identification: "85212678900025"
+          schemeName: "SIRET"
+          issuer: "FR"
+      purpose: "COMC"
+      chargeBearer: "SLEV"
+      creditTransferTransaction:
+      - paymentId:
+          instructionId: "MyInstrId"
+          endToEndId: "MyEndToEndId"
+        requestedExecutionDate: "2016-12-31T00:00:00.000+01:00"
+        instructedAmount:
+          currency: "EUR"
+          amount: "124.35"
+        remittanceInformation:
+        - "MyRemittanceInformation"
+      supplementaryData:
+        acceptedAuthenticationApproach:
+        - "REDIRECT"
+        - "DECOUPLED"
+        successfulReportUrl: "http://myPisp/PaymentSuccess"
+        unsuccessfulReportUrl: "http://myPisp/PaymentFailure"
+  PaymentCoverageRequestResource:
+    type: "object"
+    required:
+    - "accountId"
+    - "instructedAmount"
+    - "paymentCoverageRequestId"
+    properties:
+      paymentCoverageRequestId:
+        type: "string"
+        description: "Identification of the payment Coverage Request"
+        maxLength: 35
+      payee:
+        type: "string"
+        description: "The merchant where the card is accepted as information to the\
+          \ PSU."
+        maxLength: 70
+      instructedAmount:
+        $ref: "#/definitions/AmountType"
+      accountId:
+        $ref: "#/definitions/AccountIdentification"
+    description: "Payment coverage request structure. The request must rely either\
+      \ on a cash account or a payment card."
+    example:
+      paymentCoverageRequestId: "MyCoverage123456"
+      instructedAmount:
+        currency: "EUR"
+        amount: "12345"
+      accountId:
+        iban: "YY13RDHN98392489481620896668799742"
+  HalAccounts:
+    type: "object"
+    required:
+    - "_links"
+    - "accounts"
+    properties:
+      connectedPsu:
+        type: "string"
+        description: "Last name and first name that has granted access to the AISP\
+          \ on the accounts data\nThis information can be retrieved based on the PSU's\
+          \ authentication that occurred during the OAUTH2 access token initialisation.\n"
+        maxLength: 70
+      accounts:
+        type: "array"
+        description: "List of PSU account that are made available to the TPP\n"
+        items:
+          $ref: "#/definitions/AccountResource"
+      _links:
+        $ref: "#/definitions/PsuContextLinks"
+    description: "HYPERMEDIA structure used for returning the list of the available\
+      \ accounts to the AISP"
+  HalBalances:
+    type: "object"
+    required:
+    - "_links"
+    - "balances"
+    properties:
+      balances:
+        type: "array"
+        description: "List of account balances"
+        items:
+          $ref: "#/definitions/BalanceResource"
+        minItems: 1
+      _links:
+        $ref: "#/definitions/BalancesLinks"
+    description: "HYPERMEDIA structure used for returning the list of the relevant\
+      \ balances for a given account to the AISP"
+  HalTransactions:
+    type: "object"
+    required:
+    - "_links"
+    - "transactions"
+    properties:
+      transactions:
+        type: "array"
+        description: "List of transactions"
+        items:
+          $ref: "#/definitions/Transaction"
+      _links:
+        $ref: "#/definitions/TransactionsLinks"
+    description: "HYPERMEDIA structure used for returning the list of the transactions\
+      \ for a given account to the AISP"
+  HalPaymentRequest:
+    type: "object"
+    required:
+    - "_links"
+    - "paymentRequest"
+    properties:
+      paymentRequest:
+        $ref: "#/definitions/PaymentRequestResource"
+      _links:
+        $ref: "#/definitions/PaymentRequestLinks"
+    description: "HYPERMEDIA structure used for returning the original Payment Request\
+      \ to the PISP"
+  HalPaymentRequestCreation:
+    type: "object"
+    properties:
+      appliedAuthenticationApproach:
+        $ref: "#/definitions/AppliedAuthenticationApproach"
+      _links:
+        $ref: "#/definitions/PaymentRequestResourceCreationLinks"
+    description: "data forwarded by the ASPSP top the PISP after creation of the Payment\
+      \ Request resource creation\n"
+    example:
+      appliedAuthenticationApproach:
+        appliedAuthenticationApproach: "REDIRECT"
+      _links:
+        consentApproval:
+          href: "https://psd2.aspsp/consent-approval"
+  HalPaymentCoverageReport:
+    type: "object"
+    required:
+    - "_links"
+    - "request"
+    - "result"
+    properties:
+      request:
+        $ref: "#/definitions/PaymentCoverageRequestResource"
+      result:
+        type: "boolean"
+        description: "Result of the coverage check :\n- true: the payment can be covered\n\
+          - false: the payment cannot be covered\n"
+      _links:
+        $ref: "#/definitions/PaymentCoverageReportLinks"
+    description: "HYPERMEDIA structure used for returning the payment coverage report\
+      \ to the PIISP"
+  Beneficiary:
+    type: "object"
+    required:
+    - "creditor"
+    properties:
+      id:
+        type: "string"
+        description: "Id of the beneficiary"
+        pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+      isTrusted:
+        type: "boolean"
+        description: "The ASPSP having not implemented the trusted beneficiaries list\
+          \ must not set this flag.\nOtherwise, the ASPSP indicates whether or not\
+          \ the beneficiary has been registered by the PSU within the trusted beneficiaries\
+          \ list.\n- true: the beneficiary is actually a trusted beneficiary (when\
+          \ set by ASPSP)\n- false: the beneficiary is not a trusted beneficiary \
+          \        \nThe PISP may set this flag to \"true\" to indicate that the PSU\
+          \ considers the beneficiary as trusted and to be inserted within the trusted\
+          \ beneficiaries list, as far as this feature was implemented by the ASPSP.\
+          \  \n- true: the beneficiary should be registered as a trusted beneficiary\
+          \ (when set by PISP)\n"
+      creditorAgent:
+        $ref: "#/definitions/FinancialInstitutionIdentification"
+      creditor:
+        $ref: "#/definitions/PartyIdentification"
+      creditorAccount:
+        $ref: "#/definitions/AccountIdentification"
+    description: "Specification of a beneficiary"
+  HalBeneficiaries:
+    type: "object"
+    required:
+    - "_links"
+    - "beneficiaries"
+    properties:
+      beneficiaries:
+        type: "array"
+        description: "List of trusted beneficiaries"
+        items:
+          $ref: "#/definitions/Beneficiary"
+      _links:
+        $ref: "#/definitions/BeneficiariesLinks"
+    description: "HYPERMEDIA structure used for returning the list of the whitelisted\
+      \ beneficiaries"
+  AccessibleAccounts:
+    type: "array"
+    description: "List of accessible accounts for one given functionality"
+    items:
+      $ref: "#/definitions/AccountIdentification"
+  Access:
+    type: "object"
+    required:
+    - "balances"
+    - "psuIdentity"
+    - "transactions"
+    - "trustedBeneficiaries"
+    properties:
+      balances:
+        $ref: "#/definitions/AccessibleAccounts"
+      transactions:
+        $ref: "#/definitions/AccessibleAccounts"
+      trustedBeneficiaries:
+        type: "boolean"
+        description: "Indicator that access to the trusted beneficiaries list was\
+          \ granted or not to the AISP by the PSU\n- true: the access was granted\n\
+          - false: the access was not granted\n"
+      psuIdentity:
+        type: "boolean"
+        description: "Indicator that access to the PSU identity, first name and last\
+          \ name, was granted or not to the AISP by the PSU\n- true: the access was\
+          \ granted\n- false: the access was not granted\n"
+    description: "Requested access services."
+    example:
+      balances: ""
+      psuIdentity: true
+      trustedBeneficiaries: true
+      transactions: ""
+parameters:
+  AccountResourceIdentification:
+    name: "accountResourceId"
+    in: "path"
+    description: "Identification of account resource to fetch"
+    required: true
+    type: "string"
+    pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+  PaymentRequestResourceIdentification:
+    name: "paymentRequestResourceId"
+    in: "path"
+    description: "Identification of the Payment Request Resource"
+    required: true
+    type: "string"
+    pattern: "^([a-zA-Z0-9 /\\-?:\\()\\.,']{1,35})$"
+  AfterEntryReference:
+    name: "afterEntryReference"
+    in: "query"
+    description: "Specifies the value on which the result has to be computed. \n \
+      \     \nOnly the transaction having a technical identification greater than\
+      \ this value must be included within the result\n"
+    required: false
+    type: "string"
+    maxLength: 40
+  ToImputationDate:
+    name: "dateTo"
+    in: "query"
+    description: "Exclusive maximal imputation date of the transactions. \n      \n\
+      Transactions having an imputation date equal to this parameter are not included\
+      \ within the result.\n"
+    required: false
+    type: "string"
+    format: "date-time"
+  FromImputationDate:
+    name: "dateFrom"
+    in: "query"
+    description: "Inclusive minimal imputation date of the transactions. \n      \n\
+      Transactions having an imputation date equal to this parameter are included\
+      \ within the result.\n"
+    required: false
+    type: "string"
+    format: "date-time"
+  AuthorizationParameter:
+    name: "Authorization"
+    in: "header"
+    description: "Access token to be passed as a header"
+    required: true
+    type: "string"
+  PsuIpAddressHeader:
+    name: "PSU-IP-Address"
+    in: "header"
+    description: "IP address used by the PSU's terminal when connecting to the TPP"
+    required: false
+    type: "string"
+  PsuIpPortHeader:
+    name: "PSU-IP-Port"
+    in: "header"
+    description: "IP port used by the PSU's terminal when connecting to the TPP"
+    required: false
+    type: "string"
+  PsuHttpMethodHeader:
+    name: "PSU-HTTP-Method"
+    in: "header"
+    description: "Http method for the most relevant PSU’s terminal request to the\
+      \ TTP"
+    required: false
+    type: "string"
+  PsuDateHeader:
+    name: "PSU-Date"
+    in: "header"
+    description: "Timestamp of the most relevant PSU’s terminal request to the TTP"
+    required: false
+    type: "string"
+  PsuGeoLocation:
+    name: "PSU-GEO-Location"
+    in: "header"
+    description: "Geographical location of the PSU as provided by the PSU mobile terminal\
+      \ if any to the TPP"
+    required: false
+    type: "string"
+  PsuUserAgentHeader:
+    name: "PSU-User-Agent"
+    in: "header"
+    description: "\"User-Agent\" header field sent by the PSU terminal when connecting\
+      \ to the TPP\n"
+    required: false
+    type: "string"
+  PsuRefererHeader:
+    name: "PSU-Referer"
+    in: "header"
+    description: "\"Referer\" header field sent by the PSU terminal when connecting\
+      \ to the TPP.\nNotice that an initial typo in RFC 1945 specifies that \"referer\"\
+      \ (incorrect spelling) is to be used. The correct spelling \"referrer\" can\
+      \ be used but might not be understood.\n"
+    required: false
+    type: "string"
+  PsuAcceptHeader:
+    name: "PSU-Accept"
+    in: "header"
+    description: "\"Accept\" header field sent by the PSU terminal when connecting\
+      \ to the TPP\n"
+    required: false
+    type: "string"
+  PsuAcceptCharsetHeader:
+    name: "PSU-Accept-Charset"
+    in: "header"
+    description: "\"Accept-Charset\" header field sent by the PSU terminal when connecting\
+      \ to the TPP\n"
+    required: false
+    type: "string"
+  PsuAcceptEncodingHeader:
+    name: "PSU-Accept-Encoding"
+    in: "header"
+    description: "\"Accept-Encoding\" header field sent by the PSU terminal when connecting\
+      \ to the TPP\n"
+    required: false
+    type: "string"
+  PsuAcceptLanguageHeader:
+    name: "PSU-Accept-Language"
+    in: "header"
+    description: "\"Accept-Language\" header field sent by the PSU terminal when connecting\
+      \ to the TPP\n"
+    required: false
+    type: "string"
+  PsuDeviceId:
+    name: "PSU-Device-ID"
+    in: "header"
+    description: "UUID (Universally Unique Identifier) for a device, which is used\
+      \ by the PSU, if available.\nUUID identifies either a device or a device dependant\
+      \ application installation.\nIn case of installation identification this ID\
+      \ need to be unaltered until removal from device.\n"
+    required: false
+    type: "string"
+  DigestHeader:
+    name: "Digest"
+    in: "header"
+    description: "Digest of the body"
+    required: false
+    type: "string"
+  SignatureHeader:
+    name: "Signature"
+    in: "header"
+    description: "http-signature of the request (cf. https://datatracker.ietf.org/doc/draft-cavage-http-signatures/)\n\
+      The keyId must specify the way to get the relevant qualified certificate. It\
+      \ is requested that this identifier is an URL aiming to provide the relevant\
+      \ Qualified Certificate.\n"
+    required: true
+    type: "string"
+  Correlation:
+    name: "X-Request-ID"
+    in: "header"
+    description: "Correlation header to be set in a request and retrieved in the relevant\
+      \ response\n"
+    required: true
+    type: "string"
+    maxLength: 70
+  PaymentRequest:
+    in: "body"
+    name: "paymentRequest"
+    description: "ISO20022 based payment Initiation Request"
+    required: true
+    schema:
+      $ref: "#/definitions/PaymentRequestResource"
+  Confirmation:
+    in: "body"
+    name: "confirmationRequest"
+    description: "parameters needed for confirmation of the Payment Request, especially\
+      \ in EMBEDDED approach"
+    required: false
+    schema:
+      $ref: "#/definitions/ConfirmationResource"
+  PaymentCoverageRequest:
+    in: "body"
+    name: "paymentCoverage"
+    description: "parameters of a payment coverage request"
+    required: true
+    schema:
+      $ref: "#/definitions/PaymentCoverageRequestResource"
+  Consents:
+    in: "body"
+    name: "access"
+    description: "List of consents granted to the AISP by the PSU."
+    required: false
+    schema:
+      $ref: "#/definitions/Access"
+responses:
+  204:
+    description: "No content."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+  400:
+    description: "Invalid status value"
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  401:
+    description: "Unauthorized, authentication failure."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  403:
+    description: "Forbidden, authentication successful but access to resource is not\
+      \ allowed."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  404:
+    description: "Not found, no request available."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  405:
+    description: "Method Not Allowed."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  406:
+    description: "Not Acceptable."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  408:
+    description: "Request Timeout."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  429:
+    description: "Too many requests."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  503:
+    description: "Service unavailable."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
+  500:
+    description: "Internal server error."
+    headers:
+      X-Request-ID:
+        type: "string"
+        description: "Correlation header to be set in a request and retrieved in the\
+          \ relevant response\n"
+    schema:
+      $ref: "#/definitions/ErrorModel"
