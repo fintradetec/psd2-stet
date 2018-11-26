@@ -1,0 +1,2331 @@
+<!doctype html>
+<html>
+  <head>
+    <title>PSD2 ASPSP services for AISP, PISP and PIISP.</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>PSD2 ASPSP services for AISP, PISP and PIISP.</h1>
+    <div class="app-desc"><p>This API intends to provide an interface between</p>
+<ul>
+<li>Account Servicing Payment Service Providers (ASPSP)</li>
+<li>Third Party (Payment Service) Providers (TPP)</li>
+</ul>
+<p>TPP may act with different roles as described below:</p>
+<ul>
+<li>Account Information Service Providers (AISP)</li>
+<li>Payment Initiation Service Providers (PISP)</li>
+<li>Payment Instrument Issuer Service Providers (PIISP)</li>
+</ul>
+<p>The Payment Service User (PSU) is the owner of the accounts held by the ASPSP and gives accreditations to the TPP in order to access his accounts information or initiates payment from these accounts</p>
+<p>The API is designed on a REST model using JSON structures.</p>
+<p>The Richardson Maturity Model is applied on level three using HAL HYPERMEDIA links</p>
+<p>This version implements</p>
+<ul>
+<li>CR1: Allow a TPP to suggest a SCA execution or a SCA exemption through the API</li>
+<li>CR93: Client Credential OAUTH2 TOKEN for PIISP</li>
+<li>CR148: Allow the use of the payment-request also for payment on behalf of the ordering party</li>
+<li>CR158: Implementation of access (Read-Only) to the list of trusted beneficiaries</li>
+<li>CR159: Payment request with no immediate execution of an instruction</li>
+<li>CR160: Recurrent payments handling</li>
+<li>CR161: Payment initiation with multiple instructions</li>
+<li>CR164: Implement mixed consent management model for AISP</li>
+<li>CR179: Forward Information about the beneficiary to be registered as trusted or not to the PISP</li>
+<li>CR180: Forward Information about the availability of funds to the PISP</li>
+<li>CR181: Removal of FULL ASPSP (B2) consent model</li>
+<li>CR182: Cancellation of payment requests</li>
+<li>CR184: Removal of transfer-requests resource</li>
+<li>CR185: Add CARD account payment Type</li>
+<li>CR188: Externalize common HTTP return codes</li>
+<li>CR189: Add a payload to each HTTP return code</li>
+<li>CR191: Set a Max value for [numberOfTransactions] field</li>
+<li>CR194: Merge &quot;payment-requests&quot; and &quot;periodic-payment-requests&quot; API entry-points</li>
+<li>CR195: Use a PUT entry-point in order to implement cancellation of payments</li>
+<li>CR197: Add connected PSU's last name et first name</li>
+<li>CR198: Allow the PISP to suggest the insertion the beneficiary of the payment within the trusted beneficiaries list</li>
+<li>CR199: Apply HTTP signature on response sent by ASPSP</li>
+</ul>
+</div>
+    <div class="app-desc">More information: <a href="https://www.stet.eu/en/psd2/">https://www.stet.eu/en/psd2/</a></div>
+    <div class="app-desc">Contact Info: <a href="psd2@stet.eu">psd2@stet.eu</a></div>
+    <div class="app-desc">Version: 1.4.0.47</div>
+    <div class="app-desc">BasePath:/v1</div>
+    <div class="license-info">Creative Commons Attribution 3.0 France (CC BY 3.0 FR)</div>
+    <div class="license-url">http://apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+    <ol>
+      <li>OAuth AuthorizationUrl:https://oauth2.aspsp/authorizationTokenUrl:https://oauth2.aspsp/token</li>
+      <li>OAuth AuthorizationUrl:TokenUrl:https://oauth2.aspsp/token</li>
+      <li>OAuth AuthorizationUrl:TokenUrl:https://oauth2.aspsp/token</li>
+    </ol>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#AISP">AISP</a></h4>
+  <ul>
+  <li><a href="#accountsBalancesGet"><code><span class="http-method">get</span> /accounts/{accountResourceId}/balances</code></a></li>
+  <li><a href="#accountsGet"><code><span class="http-method">get</span> /accounts</code></a></li>
+  <li><a href="#accountsTransactionsGet"><code><span class="http-method">get</span> /accounts/{accountResourceId}/transactions</code></a></li>
+  <li><a href="#consentsPut"><code><span class="http-method">put</span> /consents</code></a></li>
+  <li><a href="#trustedBeneficiariesGet"><code><span class="http-method">get</span> /trusted-beneficiaries</code></a></li>
+  </ul>
+  <h4><a href="#PIISP">PIISP</a></h4>
+  <ul>
+  <li><a href="#fundsConfirmationsPost"><code><span class="http-method">post</span> /funds-confirmations</code></a></li>
+  </ul>
+  <h4><a href="#PISP">PISP</a></h4>
+  <ul>
+  <li><a href="#paymentRequestConfirmationPost"><code><span class="http-method">post</span> /payment-requests/{paymentRequestResourceId}/confirmation</code></a></li>
+  <li><a href="#paymentRequestPut"><code><span class="http-method">put</span> /payment-requests/{paymentRequestResourceId}</code></a></li>
+  <li><a href="#paymentRequestsGet"><code><span class="http-method">get</span> /payment-requests/{paymentRequestResourceId}</code></a></li>
+  <li><a href="#paymentRequestsPost"><code><span class="http-method">post</span> /payment-requests</code></a></li>
+  </ul>
+
+  <h1><a name="AISP">AISP</a></h1>
+  <div class="method"><a name="accountsBalancesGet"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /accounts/{accountResourceId}/balances</code></pre></div>
+    <div class="method-summary">Retrieval of an account balances report (AISP) (<span class="nickname">accountsBalancesGet</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+  This call returns a set of balances for a given PSU account that is specified by the AISP through an account resource Identification
+  <ul>
+    <li>The ASPSP must provide at least the accounting balance on the account.</li>
+    <li>The ASPSP can provide other balance restitutions, e.g. instant balance, as well, if possible.</li>
+    <li>Actually, from the PSD2 perspective, any other balances that are provided through the Web-Banking service of the ASPSP must also be provided by this ASPSP through the API.</li>
+  </ul>
+<h3>Prerequisites</h3>
+  <ul>
+    <li>The TPP has been registered by the Registration Authority for the AISP role</li>
+    <li>The TPP and the PSU have a contract that has been enrolled by the ASPSP
+    <ul style="list-style-type:circle;">
+      <li>At this step, the ASPSP has delivered an OAUTH2 &ldquo;Authorization Code&rdquo; or &ldquo;Resource Owner Password&rdquo; access token to the TPP (cf. &sect; 3.4.2).</li>
+    </ul>
+    </li>
+    <li>The TPP and the ASPSP have successfully processed a mutual check and authentication</li>
+    <li>The TPP has presented its OAUTH2 &ldquo;Authorization Code&rdquo; or &ldquo;Resource Owner Password&rdquo; access token which allows the ASPSP to identify the relevant PSU and retrieve the linked PSU context (cf. &sect; 3.4.2) if any.</li>
+    <li>The ASPSP takes into account the access token that establishes the link between the PSU and the AISP.</li>
+    <li>The TPP has previously retrieved the list of available accounts for the PSU</li>
+  </ul>
+<h3>Business flow</h3>
+  The AISP requests the ASPSP on one of the PSU&rsquo;s accounts.<br />
+  The ASPSP answers by providing a list of balances on this account.
+  <ul>
+    <li>The ASPSP must provide at least the accounting balance on the account.</li>
+    <li>The ASPSP can provide other balance restitutions, e.g. instant balance, as well, if possible.</li>
+    <li>Actually, from the PSD2 perspective, any other balances that are provided through the Web-Banking service of the ASPSP must also be provided by this ASPSP through the API.</li>
+  </ul>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">accountResourceId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Identification of account resource to fetch </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalBalances">HalBalances</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    The ASPSP answers with a list of account balances
+        <a href="#HalBalances">HalBalances</a>
+    <h4 class="field-label">204</h4>
+    No content.
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">404</h4>
+    Not found, no request available.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="accountsGet"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /accounts</code></pre></div>
+    <div class="method-summary">Retrieval of the PSU accounts (AISP) (<span class="nickname">accountsGet</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+  This call returns all payment accounts that are relevant the PSU on behalf of whom the AISP is connected.
+  Thanks to HYPERMEDIA, each account is returned with the links aiming to ease access to the relevant transactions and balances.
+  The result may be subject to pagination (i.e. retrieving a partial result in case of having too many results) through a set of pages by the ASPSP. Thereafter, the AISP may ask for the first, next, previous or last page of results.
+<h3>Prerequisites</h3>
+  <ul>
+    <li>The TPP has been registered by the Registration Authority for the AISP role.</li>
+    <li>The TPP and the PSU have a contract that has been enrolled by the ASPSP</li>
+      <ul>
+        <li>At this step, the ASPSP has delivered an OAUTH2 "Authorization Code" or "Resource Owner Password" access token to the TPP (cf. § 3.4.2).</li>
+      </ul>
+    <li>The TPP and the ASPSP have successfully processed a mutual check and authentication</li>
+    <li>The TPP has presented its OAUTH2 "Authorization Code" or "Resource Owner Password" access token which allows the ASPSP to identify the relevant PSU and retrieve the linked PSU context (cf. § 3.4.2) if any.</li>
+    <li>The ASPSP takes into account the access token that establishes the link between the PSU and the AISP.</li>
+  </ul>
+<h3>Business Flow</h3>
+  The TPP sends a request to the ASPSP for retrieving the list of the PSU payment accounts.
+  The ASPSP computes the relevant PSU accounts and builds the answer as an accounts list. 
+  The result may be subject to pagination in order to avoid an excessive result set. 
+  Each payment account will be provided with its characteristics.
+</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalAccounts">HalAccounts</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    <p>The ASPSP return a PSU context</p>
+<ul>
+<li>listing the accounts that have been made available to the AISP by the PSU and,</li>
+<li>for each of these accounts, the further transactions that have been enabled by the PSU through HYPERMEDIA links.</li>
+</ul>
+
+        <a href="#HalAccounts">HalAccounts</a>
+    <h4 class="field-label">204</h4>
+    No content.
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">404</h4>
+    Not found, no request available.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="accountsTransactionsGet"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /accounts/{accountResourceId}/transactions</code></pre></div>
+    <div class="method-summary">Retrieval of an account transaction set (AISP) (<span class="nickname">accountsTransactionsGet</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+  This call returns transactions for an account for a given PSU account that is specified by the AISP through an account resource identification.
+  The request may use some filter parameter in order to restrict the query 
+  <ul>
+    <li>on a given imputation date range</li>
+    <li>past a given incremental technical identification</li>
+  </ul>
+  The result may be subject to pagination (i.e. retrieving a partial result in case of having too many results) through a set of pages by the ASPSP. Thereafter, the AISP may ask for the first, next, previous or last page of results.
+<h3>Prerequisites</h3>
+  <ul>
+    <li>The TPP has been registered by the Registration Authority for the AISP role</li>
+    <li>The TPP and the PSU have a contract that has been enrolled by the ASPSP</li>
+    <ul>
+      <li>At this step, the ASPSP has delivered an OAUTH2 "Authorization Code" or "Resource Owner Password" access token to the TPP (cf. § 3.4.2).</li>
+    </ul>
+    <li>The TPP and the ASPSP have successfully processed a mutual check and authentication </li>
+    <li>The TPP has presented its OAUTH2 "Authorization Code" or "Resource Owner Password" access token which allows the ASPSP to identify the relevant PSU and retrieve the linked PSU context (cf. § 3.4.2) is any.</li>
+    <li>The ASPSP takes into account the access token that establishes the link between the PSU and the AISP.</li>
+    <li>The TPP has previously retrieved the list of available accounts for the PSU</li>
+  </ul>
+<h3>Business flow</h3>
+  The AISP requests the ASPSP on one of the PSU’s accounts. It may specify some selection criteria.
+  The ASPSP answers by a set of transactions that matches the query. The result may be subject to pagination in order to avoid an excessive result set.
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">accountResourceId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Identification of account resource to fetch </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Query parameters</h3>
+    <div class="field-items">
+      <div class="param">dateFrom (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; <p>Inclusive minimal imputation date of the transactions.</p>
+<p>Transactions having an imputation date equal to this parameter are included within the result.</p>
+ format: date-time</div><div class="param">dateTo (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; <p>Exclusive maximal imputation date of the transactions.</p>
+<p>Transactions having an imputation date equal to this parameter are not included within the result.</p>
+ format: date-time</div><div class="param">afterEntryReference (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Query Parameter</span> &mdash; <p>Specifies the value on which the result has to be computed.</p>
+<p>Only the transaction having a technical identification greater than this value must be included within the result</p>
+ </div>
+    </div>  <!-- field-items -->
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalTransactions">HalTransactions</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Complete transactions response
+        <a href="#HalTransactions">HalTransactions</a>
+    <h4 class="field-label">204</h4>
+    No content.
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">404</h4>
+    Not found, no request available.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="consentsPut"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /consents</code></pre></div>
+    <div class="method-summary">Forwarding the PSU consent (AISP) (<span class="nickname">consentsPut</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+  In the mixed detailed consent on accounts
+  <ul>
+    <li>the AISP captures the consent of the PSU</li>
+    <li>then it forwards this consent to the ASPSP</li>
+  </ul>
+  This consent replaces any prior consent that was previously sent by the AISP.
+<h3>Prerequisites</h3>
+  <ul>
+    <li>The TPP has been registered by the Registration Authority for the AISP role.</li>
+    <li>The TPP and the PSU have a contract that has been enrolled by the ASPSP</li>
+      <ul>
+      <li>At this step, the ASPSP has delivered an OAUTH2 "Authorization Code" or "Resource Owner Password" access token to the TPP (cf. § 3.4.2).</li>
+      </ul>
+    <li>The TPP and the ASPSP have successfully processed a mutual check and authentication</li>
+    <li>The TPP has presented its OAUTH2 "Authorization Code" or "Resource Owner Password" access token which allows the ASPSP to identify the relevant PSU and retrieve the linked PSU context (cf. § 3.4.2) if any.</li>
+    <li>The ASPSP takes into account the access token that establishes the link between the PSU and the AISP.</li>
+  </ul>
+<h3>Business Flow</h3>
+  The PSU specifies to the AISP which of his/her accounts will be accessible and which functionalities should be available.
+  The AISP forwards these settings to the ASPSP.
+  The ASPSP answers by HTTP201 return code.
+</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">access <a href="#Access">Access</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; List of consents granted to the AISP by the PSU. </div>
+
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">201</h4>
+    Created
+        <a href="#"></a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="trustedBeneficiariesGet"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /trusted-beneficiaries</code></pre></div>
+    <div class="method-summary">Retrieval of the trusted beneficiaries list (AISP) (<span class="nickname">trustedBeneficiariesGet</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+  This call returns all trusted beneficiaries that have been set by the PSU.
+  Those beneficiaries can benefit from an SCA exemption during payment initiation.
+  The result may be subject to pagination (i.e. retrieving a partial result in case of having too many results) through a set of pages by the ASPSP. Thereafter, the AISP may ask for the first, next, previous or last page of results.
+<h3>Prerequisites</h3>
+  <ul>
+    <li>The TPP has been registered by the Registration Authority for the AISP role.</li>
+    <li>The TPP and the PSU have a contract that has been enrolled by the ASPSP</li>
+      <ul>
+        <li>At this step, the ASPSP has delivered an OAUTH2 "Authorization Code" or "Resource Owner Password" access token to the TPP (cf. § 3.4.2).</li>
+      </ul>
+    <li>The TPP and the ASPSP have successfully processed a mutual check and authentication</li>
+    <li>The TPP has presented its OAUTH2 "Authorization Code" or "Resource Owner Password" access token which allows the ASPSP to identify the relevant PSU and retrieve the linked PSU context (cf. § 3.4.2) if any.</li>
+    <li>The ASPSP takes into account the access token that establishes the link between the PSU and the AISP.</li>
+  </ul>
+<h3>Business Flow</h3>
+  The AISP asks for the trusted beneficiaries list.
+  The ASPSP answers with a list of beneficiary details structure.
+</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalBeneficiaries">HalBeneficiaries</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    The ASPSP returns the list of whitelisted beneficiaries
+        <a href="#HalBeneficiaries">HalBeneficiaries</a>
+    <h4 class="field-label">204</h4>
+    No content.
+        <a href="#"></a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">404</h4>
+    Not found, no request available.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="PIISP">PIISP</a></h1>
+  <div class="method"><a name="fundsConfirmationsPost"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /funds-confirmations</code></pre></div>
+    <div class="method-summary">Payment coverage check request (PIISP) (<span class="nickname">fundsConfirmationsPost</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+The PIISP can ask an ASPSP to check if a given amount can be covered by the liquidity that is available on a PSU cash account or payment card.
+<h3>Prerequisites</h3>
+<ul>
+  <li>The TPP has been registered by the Registration Authority for the PIISP role</li>
+  <li>The TPP and the PSU have a contract that has been registered by the ASPSP</li>
+  <ul>
+    <li>At this step, the ASPSP has delivered an "Authorization Code", a "Resource Owner Password" or a "Client Credential" OAUTH2 access token to the TPP (cf. § 3.4.2).</li>
+    <li>Each ASPSP has to implement either the "Authorization Code"/"Resource Owner Password" or the "Client Credential" OAUTH2 access token model.</li>
+    <li>Doing this, it will edit the [security] section on this path in order to specify which model it has chosen</li>
+  </ul>
+  <li>The TPP and the ASPSP have successfully processed a mutual check and authentication </li>
+  <li>The TPP has presented its OAUTH2 "Authorization Code" or "Resource Owner Password" access token which allows the ASPSP to identify the relevant PSU.</li>
+</ul>
+<h3>Business flow</h3>
+The PIISP requests the ASPSP for a payment coverage check against either a bank account or a card primary identifier.
+The ASPSP answers with a structure embedding the original request and the result as a Boolean.      
+</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">paymentCoverage <a href="#PaymentCoverageRequestResource">PaymentCoverageRequestResource</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; parameters of a payment coverage request </div>
+
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalPaymentCoverageReport">HalPaymentCoverageReport</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    payment coverage request
+        <a href="#HalPaymentCoverageReport">HalPaymentCoverageReport</a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <h1><a name="PISP">PISP</a></h1>
+  <div class="method"><a name="paymentRequestConfirmationPost"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /payment-requests/{paymentRequestResourceId}/confirmation</code></pre></div>
+    <div class="method-summary">Confirmation of a payment request or a modification request (PISP) (<span class="nickname">paymentRequestConfirmationPost</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+  The PISP confirms one of the following requests<br>
+  <ul>
+    <li>payment request on behalf of a merchant</li>
+    <li>transfer request on behalf of the account's owner</li>
+    <li>standing-order request on behalf of the account's owner</li>
+  </ul>
+  The ASPSP answers with a status of the relevant request and the subsequent Credit Transfer.
+<h3>Prerequisites</h3>
+  <ul>
+    <li> The TPP has been registered by the Registration Authority for the PISP role</li>
+    <li> The TPP was provided with an OAUTH2 "Client Credential" access token by the ASPSP (cf. § 3.4.3).</li>
+    <li> The TPP has previously posted a Request which has been saved by the ASPSP (cf. § 4.5.3)</li>
+    <ul>
+      <li>The ASPSP has answered with a location link to the saved Payment Request (cf. § 4.5.4)</li>
+      <li> The TPP has retrieved the saved request in order to get the relevant resource Ids (cf. § 4.6).</li>
+    </ul>
+    <li> The TPP and the ASPSP have successfully processed a mutual check and authentication </li>
+    <li> The TPP has presented its "OAUTH2 Client Credential" access token </li>
+  </ul>
+<h3>Business flow</h3>
+  Once the PSU has been authenticated, it is the due to the PISP to confirm the Request to the ASPSP in order to complete the process flow.<br>
+  In REDIRECT and DECOUPLED approach, this confirmation is not a prerequisite to the execution of the Credit Transfer.<br>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">paymentRequestResourceId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Identification of the Payment Request Resource </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">confirmationRequest <a href="#ConfirmationResource">ConfirmationResource</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; parameters needed for confirmation of the Payment Request, especially in EMBEDDED approach </div>
+
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalPaymentRequest">HalPaymentRequest</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    retrieval of the Payment Request enriched with the status report
+        <a href="#HalPaymentRequest">HalPaymentRequest</a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="paymentRequestPut"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="put"><code class="huge"><span class="http-method">put</span> /payment-requests/{paymentRequestResourceId}</code></pre></div>
+    <div class="method-summary">Modification of a Payment/Transfer Request (PISP) (<span class="nickname">paymentRequestPut</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+The PISP sent a Payment/Transfer Request through a POST command.<br>
+  The ASPSP registered the Payment/Transfer Request, updated if necessary the relevant identifiers in order to avoid duplicates and returned the location of the updated Request.<br>
+  The PISP got the Payment/Transfer Request that might have been updated with the resource identifiers, the status of the Payment/Transfer Request and the status of the subsequent credit transfer.<br>
+  The PISP request for the payment cancellation or for some payment instructions cancellation<br>
+  No other modification of the Payment/Transfer Request is allowed.<br/>
+<h3>Prerequisites</h3>
+<ul>
+  <li>The TPP was registered by the Registration Authority for the PISP role</li>
+  <li>The TPP was provided with an OAUTH2 "Client Credential" access token by the ASPSP (cf. § 3.4.3).</li>
+  <li>The TPP previously posted a Payment/Transfer Request which was saved by the ASPSP (cf. § 4.5.3)</li>
+  <ul>
+    <li>The ASPSP answered with a location link to the saved Payment/Transfer Request (cf. § 4.5.4)</li>
+    <li>The PISP retrieved the saved Payment/Transfer Request (cf. § 4.5.4)</li>
+  </ul>
+  <li>The TPP and the ASPSP successfully processed a mutual check and authentication </li>
+  <li>The TPP presented its "OAUTH2 Client Credential" access token.</li>
+  <li>The TPP presented the payment/transfer request.</li>
+  <li>The PSU was successfully authenticated.</li>
+</ul>
+<h3>Business flow</h3>
+the following cases can be applied:
+<ul>
+  <li>Case of a payment with multiple instructions or a standing order, the PISP asks to cancel the whole Payment/Transfer or Standing Order Request including all non-executed payment instructions by setting the [paymentInformationStatus] to "RJCT" and the relevant [statusReasonInformation] to "DS02" at payment level.</li>
+  <li>Case of a payment with multiple instructions, the PISP asks to cancel one or several payment instructions by setting the [transactionStatus] to "RJCT" and the relevant [statusReasonInformation] to "DS02" at each relevant instruction level.</li>
+</ul>
+Since the modification request needs a PSU authentication before committing, the modification request includes:</li>
+  <ul>
+    <li>The specification of the authentication approaches that are supported by the PISP (any combination of "REDIRECT", "EMBEDDED" and "DECOUPLED" values).</li>
+    <li>In case of possible REDIRECT or DECOUPLED authentication approach, one or two call-back URLs to be used by the ASPSP at the finalisation of the authentication and consent process :</li>
+    <ul>
+      <li>The first call-back URL will be called by the ASPSP if the Transfer Request is processed without any error or rejection by the PSU</li>
+      <li>The second call-back URL is to be used by the ASPSP in case of processing error or rejection by the PSU. Since this second URL is optional, the PISP might not provide it. In this case, the ASPSP will use the same URL for any processing result.</li>
+      <li>Both call-back URLS must be used in a TLS-secured request, including mutual authentication based on each party’s TLS certificate.</li>
+    </ul>
+    <li>In case of possible "EMBEDDED" or "DECOUPLED" approaches, a PSU identifier that can be processed by the ASPSP for PSU recognition.</li>
+  </ul>
+  <li>The ASPSP saves the updated Payment/Transfer Request and answers to the PISP. The answer embeds </li>
+  <ul>
+    <li>The specification of the chosen authentication approach taking into account both the PISP and the PSU capabilities.</li>
+    <li>In case of chosen REDIRECT authentication approach, the URL to be used by the PISP for redirecting the PSU in order to perform an authentication.</li>
+  </ul>
+</ul>
+<h3>Authentication flows for both use cases</h3>
+<h4>Redirect authentication approach </h4>
+When the chosen authentication approach within the ASPSP answers is set to "REDIRECT":<br>
+<ul>
+  <li>The PISP redirects the PSU to the ASPSP which authenticates the PSU </li>
+  <li>The ASPSP asks the PSU to give (or deny) his/her consent to the Payment Request</li>
+  <li>The PSU chooses or confirms which of his/her accounts shall be used by the ASPSP for the future Credit Transfer.</li>
+  <li>The ASPSP is then able to initiate the subsequent Credit Transfer</li>
+  <li>The ASPSP redirects the PSU to the PISP using one of the call-back URLs provided within the posted Payment Request</li>
+</ul>
+If the PSU neither gives nor denies his/her consent, the Payment Request shall expire and is then rejected to the PISP. The expiration delay is specified by each ASPSP.<br>
+<h4>Decoupled authentication approach</h4>
+When the chosen authentication approach is "DECOUPLED":<br>
+<ul>
+  <li>Based on the PSU identifier provided within the Payment Request by the PISP, the ASPSP gives the PSU with the Payment Request details and challenges the PSU for a Strong Customer Authentication on a decoupled device or application.</li>
+  <li>The PSU chooses or confirms which of his/her accounts shall be used by the ASPSP for the future Credit Transfer.</li>
+  <li>The ASPSP is then able to initiate the subsequent Credit Transfer</li>
+  <li>The ASPSP notifies the PISP about the finalisation of the authentication and consent process by using one of the call-back URLs provided within the posted Payment Request</li>
+</ul>
+If the PSU neither gives nor denies his/her consent, the Payment Request shall expire and is then rejected to the PISP. The expiration delay is specified by each ASPSP.<br>
+<h4>Embedded authentication approach</h4>
+When the chosen authentication approach within the ASPSP answers is set to "EMBEDDED":<br>
+<ul>
+  <li>The TPP informs the PSU that a challenge is needed for completing the Payment Request processing. This challenge will be one of the following:</li>
+  <ul>
+    <li>A One-Time-Password sent by the ASPSP to the PSU on a separate device or application.</li>
+    <li>A response computed by a specific device on base of a challenge sent by the ASPSP to the PSU on a separate device or application.</li>
+  </ul>
+  <li>The PSU unlock the device or application through a "knowledge factor" and/or an "inherence factor" (biometric), retrieves the Payment Request details and processes the data sent by the ASPSP; </li>
+  <li>The PSU might choose or confirm which of his/her accounts shall be used by the ASPSP for the future Credit Transfer when the device or application allows it.</li>
+  <li>When agreeing the Payment Request, the PSU enters the resulting authentication factor through the PISP interface which will forward it to the ASPSP through a confirmation request (cf. § 4.7)</li>
+</ul>
+Case of the PSU neither gives nor denies his/her consent, the Payment Request shall expire and is then rejected to the PISP. The expiration delay is specified by each ASPSP.<br>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">paymentRequestResourceId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Identification of the Payment Request Resource </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">paymentRequest <a href="#PaymentRequestResource">PaymentRequestResource</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; ISO20022 based payment Initiation Request </div>
+
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalPaymentRequestCreation">HalPaymentRequestCreation</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "appliedAuthenticationApproach" : {
+    "appliedAuthenticationApproach" : "REDIRECT"
+  },
+  "_links" : {
+    "consentApproval" : {
+      "href" : "https://psd2.aspsp/consent-approval"
+    }
+  }
+}</code></pre>
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    The modification request has been saved. The ASPSP must authenticate the PSU before committing the update.
+        <a href="#HalPaymentRequestCreation">HalPaymentRequestCreation</a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">404</h4>
+    Not found, no request available.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="paymentRequestsGet"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /payment-requests/{paymentRequestResourceId}</code></pre></div>
+    <div class="method-summary">Retrieval of a payment request (PISP) (<span class="nickname">paymentRequestsGet</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+The following use cases can be applied:
+<ul>
+  <li>retrieval of a payment request on behalf of a merchant</li>
+  <li>retrieval of a transfer request on behalf of the account's owner</li>
+  <li>retrieval of a standing-order request on behalf of the account's owner</li>
+</ul>
+The PISP has sent a Request through a POST command. <br>
+  The ASPSP has registered the Request, updated if necessary the relevant identifiers in order to avoid duplicates and returned the location of the updated Request.<br>
+  The PISP gets the Request that might have been updated with the resource identifiers, the status of the Payment/Transfer Request and the status of the subsequent credit transfer.<br>
+<h3>Prerequisites</h3>
+<ul>
+  <li>The TPP has been registered by the Registration Authority for the PISP role</li>
+  <li>The TPP was provided with an OAUTH2 "Client Credential" access token by the ASPSP (cf. § 3.4.3).</li>
+  <li>The TPP has previously posted a Request which has been saved by the ASPSP (cf. § 4.5.3)</li>
+  <ul>
+    <li>The ASPSP has answered with a location link to the saved Payment/Transfer Request (cf. § 4.5.4)</li>
+  </ul>
+  <li>The TPP and the ASPSP have successfully processed a mutual check and authentication </li>
+  <li>The TPP has presented its "OAUTH2 Client Credential" access token</li>
+</ul>
+<h3>Business flow</h3>
+The PISP asks to retrieve the Payment/Transfer Request that has been saved by the ASPSP. The PISP uses the location link provided by the ASPSP in response of the posting of this request.<br>
+The ASPSP returns the previously posted Payment/Transfer Request which is enriched with:<br>
+<ul>
+  <li>The resource identifiers given by the ASPSP</li>
+  <li>The status information of the Payment Request and of the subsequent credit transfer</li>
+</ul>
+The status information must be available during at least 30 calendar days after the posting of the Payment Request. However, the ASPSP may increase this availability duration, based on its own rules.<br>
+</div>
+
+    <h3 class="field-label">Path parameters</h3>
+    <div class="field-items">
+      <div class="param">paymentRequestResourceId (required)</div>
+
+      <div class="param-desc"><span class="param-type">Path Parameter</span> &mdash; Identification of the Payment Request Resource </div>
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalPaymentRequest">HalPaymentRequest</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Retrieval of the previously posted Payment Request
+        <a href="#HalPaymentRequest">HalPaymentRequest</a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">404</h4>
+    Not found, no request available.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="paymentRequestsPost"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /payment-requests</code></pre></div>
+    <div class="method-summary">Payment request initiation (PISP) (<span class="nickname">paymentRequestsPost</span>)</div>
+    <div class="method-notes"><h3>Description</h3>
+The following use cases can be applied:
+<ul>
+  <li>payment request on behalf of a merchant</li>
+  <li>transfer request on behalf of the account's owner</li>
+  <li>standing-order request on behalf of the account's owner</li>
+</ul>
+<h4>Data content</h4>
+  A payment request or a transfer request might embed several payment instructions having
+  <ul>
+    <li>one single execution date or multiple execution dates</li>
+    <ul>
+      <li>case of one single execution date, this date must be set at the payment level</li>
+      <li>case of multiple execution dates, those dates must be set at each payment instruction level</li>
+    </ul>                 
+    <li>one single beneficiary or multiple beneficiaries</li>
+    <ul>
+      <li>case of one single beneficiary, this beneficiary must be set at the payment level</li>
+      <li>case of multiple beneficiaries, those beneficiaries must be set at each payment instruction level</li>
+    </ul>                 
+  </ul>        
+  A standing order request must embed one single payment instruction and must address one single beneficiary.
+  <ul>
+    <li>The beneficiary must be set at the payment level</li>
+    <li>The standing order specific characteristics (start date, periodicity...) must be set at the instruction level</li>
+  </ul>                 
+<h4>Prerequisites for all use cases</h4>
+<ul>
+  <li>The TPP has been registered by the Registration Authority for the PISP role</li>
+  <li>The TPP was provided with an OAUTH2 "Client Credential" access token by the ASPSP (cf. § 3.4.3).</li>
+  <li>The TPP and the ASPSP have successfully processed a mutual check and authentication </li>
+  <li>The TPP has presented its "OAUTH2 Client Credential" access token</li>
+</ul>
+<h4>Business flow</h4>
+  <h5>Payment Request use case</h5>
+    The PISP forwards a payment request on behalf of a merchant.<br>
+    The PSU buys some goods or services on an e-commerce website held by a merchant. Among other payment method, the merchant suggests the use of a PISP service. As there is obviously a contract between the merchant and the PISP, there is no need of such a contract between the PSU and this PISP to initiate the process.<br>
+    Case of the PSU that chooses to use the PISP service:<br>
+    <ul>
+      <li>The merchant forwards the requested payment characteristics to the PISP and redirects the PSU to the PISP portal.</li>
+      <li>The PISP requests from the PSU which ASPSP will be used.</li>
+      <li>The PISP prepares the Payment Request and sends this request to the ASPSP.</li>
+      <li>The Request can embed several payment instructions having different requested execution date.</li>
+      <li>The beneficiary, as being the merchant, is set at the payment level.</li>
+    </ul> 
+  <h5>Transfer Request use case</h5>
+    The PISP forwards a transfer request on behalf of the owner of the account.
+    <ul>
+      <li>The PSU provides the PISP with all information needed for the transfer.</li>
+      <li>The PISP prepares the Transfer Request and sends this request to the relevant ASPSP that holds the debtor account.</li>
+      <li>The Request can embed several payment instructions having different beneficiaries.</li>
+      <li>The requested execution date, as being the same for all instructions, is set at the payment level.</li>
+    </ul> 
+  <h5>Standing Order Request use case</h5>
+    The PISP forwards a Standing Order request on behalf of the owner of the account.
+    <ul>
+      <li>The PSU provides the PISP with all information needed for the Standing Order.</li>
+      <li>The PISP prepares the Standing Order Request and sends this request to the relevant ASPSP that holds the debtor account.</li>
+      <li>The Request embeds one single payment instruction with</li>
+      <ul>
+        <li>The requested execution date of the first occurrence</li>
+        <li>The requested execution frequency of the payment in order to compute further execution dates</li>
+        <li>An execution rule to handle cases when the computed execution dates cannot be processed (e.g. bank holydays)</li>
+        <li>An optional end date for closing the standing Order</li>
+      </ul>
+    </ul> 
+<h4>Authentication flows for all use cases</h4>
+  As the request posted by the PISP to the ASPSP needs a PSU authentication before execution, this request will include:
+  <ul>
+    <li>The specification of the authentication approaches that are supported by the PISP (any combination of "REDIRECT", "EMBEDDED" and "DECOUPLED" values).</li>
+    <li>In case of possible REDIRECT or DECOUPLED authentication approach, one or two call-back URLs to be used by the ASPSP at the finalisation of the authentication and consent process :</li>
+    <ul>
+      <li>The first call-back URL will be called by the ASPSP if the Payment Request is processed without any error or rejection by the PSU</li>
+      <li>The second call-back URL is to be used by the ASPSP in case of processing error or rejection by the PSU. Since this second URL is optional, the PISP might not provide it. In this case, the ASPSP will use the same URL for any processing result.</li>
+      <li>Both call-back URLS must be used in a TLS-secured request.</li>
+    </ul>
+    <li>In case of possible "EMBEDDED" or "DECOUPLED" approaches, the PSU identifier that can be processed by the ASPSP for PSU recognition must have been set within the request body [debtor] structure.</li>
+  </ul>
+  The ASPSP saves the request and answers to the PISP. The answer embeds:
+  <ul>
+    <li>A location link of the saved Request that will be further used to retrieve the Request and its status information.</li>
+    <li>The specification of the chosen authentication approach taking into account both the PISP and the PSU capabilities.</li>
+    <li>In case of chosen REDIRECT authentication approach, the URL to be used by the PISP for redirecting the PSU in order to perform a authentication.</li>
+  </ul>
+  Case of the PSU neither gives nor denies his/her consent, the Request shall expire and is then rejected to the PISP. The expiration delay is specified by each ASPSP.<br>
+  <h5>Redirect authentication approach </h5>
+    When the chosen authentication approach within the ASPSP answers is set to "REDIRECT":<br>
+    <ul>
+      <li>The PISP redirects the PSU to the ASPSP which authenticates the PSU </li>
+      <li>The ASPSP asks the PSU to give (or deny) his/her consent to the Payment Request</li>
+      <li>The PSU chooses or confirms which of his/her accounts shall be used by the ASPSP for the future Credit Transfer.</li>
+      <li>The ASPSP is then able to initiate the subsequent Credit Transfer</li>
+      <li>The ASPSP redirects the PSU to the PISP using one of the call-back URLs provided within the posted Payment Request</li>
+    </ul>
+    <img src="PISP Redirect Authentication.png" />
+    <img src="PISP Redirect Authentication2.png" />
+  <h5>Decoupled authentication approach</h5>
+    When the chosen authentication approach is "DECOUPLED":<br>
+    <ul>
+      <li>Based on the PSU identifier provided within the Payment Request by the PISP, the ASPSP gives the PSU with the Payment Request details and challenges the PSU for a Strong Customer Authentication on a decoupled device or application.</li>
+      <li>The PSU chooses or confirms which of his/her accounts shall be used by the ASPSP for the future Credit Transfer.</li>
+      <li>The ASPSP is then able to initiate the subsequent Credit Transfer</li>
+      <li>The ASPSP notifies the PISP about the finalisation of the authentication and consent process by using one of the call-back URLs provided within the posted Payment Request</li>
+    </ul>
+    <img src="PISP Decoupled Authentication.png" />
+    <img src="PISP Decoupled Authentication2.png" />
+  <h5>Embedded authentication approach</h5>
+    When the chosen authentication approach within the ASPSP answers is set to "EMBEDDED":<br>
+    <ul>
+      <li>The TPP informs the PSU that a challenge is needed for completing the Payment Request processing. This challenge will be one of the following:</li>
+      <ul>
+        <li>A One-Time-Password sent by the ASPSP to the PSU on a separate device or application.</li>
+        <li>A response computed by a specific device on base of a challenge sent by the ASPSP to the PSU on a separate device or application.</li>
+      </ul>
+      <li>The PSU unlock the device or application through a "knowledge factor" and/or an "inherence factor" (biometric), retrieves the Payment Request details and processes the data sent by the ASPSP; </li>
+      <li>The PSU might choose or confirm which of his/her accounts shall be used by the ASPSP for the future Credit Transfer when the device or application allows it.</li>
+      <li>When agreeing the Payment Request, the PSU enters the resulting authentication factor through the PISP interface which will forward it to the ASPSP through a confirmation request (cf. § 4.7)</li>
+    </ul>
+    <img src="PISP Embedded Authentication.png" />
+    <img src="PISP Embedded Authentication2.png" />
+</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="heaader">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">paymentRequest <a href="#PaymentRequestResource">PaymentRequestResource</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash; ISO20022 based payment Initiation Request </div>
+
+    </div>  <!-- field-items -->
+
+    <h3 class="field-label">Request headers</h3>
+    <div class="field-items">
+      
+    </div>  <!-- field-items -->
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#HalPaymentRequestCreation">HalPaymentRequestCreation</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: </div>
+    <pre class="example"><code></code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="heaader">Content-Type</span> response header.
+    <ul>
+      <li><code>application/hal+json; charset=utf-8</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">201</h4>
+    The request has been created as a resource. The ASPSP must authenticate the PSU.
+        <a href="#HalPaymentRequestCreation">HalPaymentRequestCreation</a>
+    <h4 class="field-label">400</h4>
+    Invalid status value
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized, authentication failure.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">403</h4>
+    Forbidden, authentication successful but access to resource is not allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">405</h4>
+    Method Not Allowed.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">406</h4>
+    Not Acceptable.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">408</h4>
+    Request Timeout.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">429</h4>
+    Too many requests.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">500</h4>
+    Internal server error.
+        <a href="#ErrorModel">ErrorModel</a>
+    <h4 class="field-label">503</h4>
+    Service unavailable.
+        <a href="#ErrorModel">ErrorModel</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#Access"><code>Access</code> - </a></li>
+    <li><a href="#AccessibleAccounts"><code>AccessibleAccounts</code> - </a></li>
+    <li><a href="#AccountIdentification"><code>AccountIdentification</code> - </a></li>
+    <li><a href="#AccountLinks"><code>AccountLinks</code> - </a></li>
+    <li><a href="#AccountResource"><code>AccountResource</code> - </a></li>
+    <li><a href="#AmountType"><code>AmountType</code> - </a></li>
+    <li><a href="#AppliedAuthenticationApproach"><code>AppliedAuthenticationApproach</code> - </a></li>
+    <li><a href="#BalanceResource"><code>BalanceResource</code> - </a></li>
+    <li><a href="#BalanceStatus"><code>BalanceStatus</code> - </a></li>
+    <li><a href="#BalancesLinks"><code>BalancesLinks</code> - </a></li>
+    <li><a href="#BeneficiariesLinks"><code>BeneficiariesLinks</code> - </a></li>
+    <li><a href="#Beneficiary"><code>Beneficiary</code> - </a></li>
+    <li><a href="#BookingInformation"><code>BookingInformation</code> - </a></li>
+    <li><a href="#CategoryPurposeCode"><code>CategoryPurposeCode</code> - </a></li>
+    <li><a href="#ChargeBearerCode"><code>ChargeBearerCode</code> - </a></li>
+    <li><a href="#ClearingSystemMemberIdentification"><code>ClearingSystemMemberIdentification</code> - </a></li>
+    <li><a href="#ConfirmationResource"><code>ConfirmationResource</code> - </a></li>
+    <li><a href="#CreationDateTime"><code>CreationDateTime</code> - </a></li>
+    <li><a href="#CreditTransferTransaction"><code>CreditTransferTransaction</code> - </a></li>
+    <li><a href="#EndDate"><code>EndDate</code> - </a></li>
+    <li><a href="#ErrorModel"><code>ErrorModel</code> - </a></li>
+    <li><a href="#ExecutionRule"><code>ExecutionRule</code> - </a></li>
+    <li><a href="#FinancialInstitutionIdentification"><code>FinancialInstitutionIdentification</code> - </a></li>
+    <li><a href="#FrequencyCode"><code>FrequencyCode</code> - </a></li>
+    <li><a href="#FundsAvailabilityInformation"><code>FundsAvailabilityInformation</code> - </a></li>
+    <li><a href="#GenericIdentification"><code>GenericIdentification</code> - </a></li>
+    <li><a href="#GenericLink"><code>GenericLink</code> - </a></li>
+    <li><a href="#HalAccounts"><code>HalAccounts</code> - </a></li>
+    <li><a href="#HalBalances"><code>HalBalances</code> - </a></li>
+    <li><a href="#HalBeneficiaries"><code>HalBeneficiaries</code> - </a></li>
+    <li><a href="#HalPaymentCoverageReport"><code>HalPaymentCoverageReport</code> - </a></li>
+    <li><a href="#HalPaymentRequest"><code>HalPaymentRequest</code> - </a></li>
+    <li><a href="#HalPaymentRequestCreation"><code>HalPaymentRequestCreation</code> - </a></li>
+    <li><a href="#HalTransactions"><code>HalTransactions</code> - </a></li>
+    <li><a href="#LocalInstrumentCode"><code>LocalInstrumentCode</code> - </a></li>
+    <li><a href="#PartyIdentification"><code>PartyIdentification</code> - </a></li>
+    <li><a href="#PaymentCoverageReportLinks"><code>PaymentCoverageReportLinks</code> - </a></li>
+    <li><a href="#PaymentCoverageRequestResource"><code>PaymentCoverageRequestResource</code> - </a></li>
+    <li><a href="#PaymentIdentification"><code>PaymentIdentification</code> - </a></li>
+    <li><a href="#PaymentInformationId"><code>PaymentInformationId</code> - </a></li>
+    <li><a href="#PaymentInformationStatusCode"><code>PaymentInformationStatusCode</code> - </a></li>
+    <li><a href="#PaymentRequestLinks"><code>PaymentRequestLinks</code> - </a></li>
+    <li><a href="#PaymentRequestResource"><code>PaymentRequestResource</code> - </a></li>
+    <li><a href="#PaymentRequestResourceCreationLinks"><code>PaymentRequestResourceCreationLinks</code> - </a></li>
+    <li><a href="#PaymentTypeInformation"><code>PaymentTypeInformation</code> - </a></li>
+    <li><a href="#PostalAddress"><code>PostalAddress</code> - </a></li>
+    <li><a href="#PriorityCode"><code>PriorityCode</code> - </a></li>
+    <li><a href="#PsuContextLinks"><code>PsuContextLinks</code> - </a></li>
+    <li><a href="#PurposeCode"><code>PurposeCode</code> - </a></li>
+    <li><a href="#RegulatoryReportingCode"><code>RegulatoryReportingCode</code> - </a></li>
+    <li><a href="#RegulatoryReportingCodes"><code>RegulatoryReportingCodes</code> - </a></li>
+    <li><a href="#RequestedExecutionDate"><code>RequestedExecutionDate</code> - </a></li>
+    <li><a href="#ResourceId"><code>ResourceId</code> - </a></li>
+    <li><a href="#ServiceLevelCode"><code>ServiceLevelCode</code> - </a></li>
+    <li><a href="#StatusReasonInformation"><code>StatusReasonInformation</code> - </a></li>
+    <li><a href="#SupplementaryData"><code>SupplementaryData</code> - </a></li>
+    <li><a href="#Transaction"><code>Transaction</code> - </a></li>
+    <li><a href="#TransactionIndividualStatusCode"><code>TransactionIndividualStatusCode</code> - </a></li>
+    <li><a href="#TransactionStatus"><code>TransactionStatus</code> - </a></li>
+    <li><a href="#TransactionsLinks"><code>TransactionsLinks</code> - </a></li>
+    <li><a href="#UnstructuredRemittanceInformation"><code>UnstructuredRemittanceInformation</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="Access"><code>Access</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Requested access services.</div>
+    <div class="field-items">
+      <div class="param">balances </div><div class="param-desc"><span class="param-type"><a href="#AccessibleAccounts">AccessibleAccounts</a></span>  </div>
+<div class="param">transactions </div><div class="param-desc"><span class="param-type"><a href="#AccessibleAccounts">AccessibleAccounts</a></span>  </div>
+<div class="param">trustedBeneficiaries </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> <p>Indicator that access to the trusted beneficiaries list was granted or not to the AISP by the PSU</p>
+<ul>
+<li>true: the access was granted</li>
+<li>false: the access was not granted</li>
+</ul>
+ </div>
+<div class="param">psuIdentity </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> <p>Indicator that access to the PSU identity, first name and last name, was granted or not to the AISP by the PSU</p>
+<ul>
+<li>true: the access was granted</li>
+<li>false: the access was not granted</li>
+</ul>
+ </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AccessibleAccounts"><code>AccessibleAccounts</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>List of accessible accounts for one given functionality</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AccountIdentification"><code>AccountIdentification</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Unique and unambiguous identification for the account between the account owner and the account servicer.</div>
+    <div class="field-items">
+      <div class="param">iban (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>ISO20022: International Bank Account Number (IBAN) - identification used internationally by financial institutions to uniquely identify the account of a customer.</p>
+<p>Further specifications of the format and content of the IBAN can be found in the standard ISO 13616 &quot;Banking and related financial services - International Bank Account Number (IBAN)&quot; version 1997-10-01, or later revisions.</p>
+ </div>
+<div class="param">other (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericIdentification">GenericIdentification</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AccountLinks"><code>AccountLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>links that can be used for further navigation when browsing Account Information at one account level</p>
+<ul>
+<li>balances: link to the balances of a given account</li>
+<li>transactions: link to the transactions of a given account</li>
+</ul>
+</div>
+    <div class="field-items">
+      <div class="param">balances (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">transactions (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AccountResource"><code>AccountResource</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>PSU account that is made available to the TPP</div>
+    <div class="field-items">
+      <div class="param">resourceId (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceId">ResourceId</a></span>  </div>
+<div class="param">bicFi (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Code allocated to a financial institution by the ISO 9362 Registration Authority as described in ISO 9362 &quot;Banking - Banking telecommunication messages - Business identification code (BIC)&quot;. </div>
+<div class="param">accountId (optional)</div><div class="param-desc"><span class="param-type"><a href="#AccountIdentification">AccountIdentification</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Label of the PSU account
+In case of a delayed debit card transaction set, the name shall specify the holder name and the imputation date </div>
+<div class="param">details (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Specifications that might be provided by the ASPSP</p>
+<ul>
+<li>characteristics of the account</li>
+<li>characteristics of the relevant card</li>
+</ul>
+ </div>
+<div class="param">linkedAccount (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Case of a set of pending card transactions, the APSP will provide the relevant cash account the card is set up on. </div>
+<div class="param">usage (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Specifies the usage of the account</p>
+<ul>
+<li>PRIV: private personal account</li>
+<li>ORGA: professional account</li>
+</ul>
+ </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">PRIV</div><div class="param-enum">ORGA</div>
+<div class="param">cashAccountType </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Specifies the type of the account</p>
+<ul>
+<li>CACC: Cash account</li>
+<li>CARD: List of card based transactions</li>
+</ul>
+ </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">CACC</div><div class="param-enum">CARD</div>
+<div class="param">product (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Product Name of the Bank for this account, proprietary definition </div>
+<div class="param">currency </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Currency used for the account </div>
+<div class="param">balances (optional)</div><div class="param-desc"><span class="param-type"><a href="#BalanceResource">array[BalanceResource]</a></span> list of balances provided by the ASPSP </div>
+<div class="param">psuStatus (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Relationship between the PSU and the account - Account Holder - Co-account Holder - Attorney </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#AccountLinks">AccountLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AmountType"><code>AmountType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: structure aiming to carry either an instructed amount or equivalent amount. Both structures embed the amount and the currency to be used.</p>
+<p>API: only instructed amount can be used</p>
+</div>
+    <div class="field-items">
+      <div class="param">currency </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Specifies the currency of the amount. A code allocated to a currency by a Maintenance Agency under an international identification scheme, as described in the latest edition of the international standard ISO 4217 &quot;Codes for the representation of currencies and funds&quot;. </div>
+<div class="param">amount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Amount of money to be moved between the debtor and creditor, before deduction of charges, expressed in the currency as ordered by the initiating party. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AppliedAuthenticationApproach"><code>AppliedAuthenticationApproach</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The ASPSP, based on the authentication approaches proposed by the PISP, choose the one that it can processed, in respect with the preferences and constraints of the PSU and indicates in this field which approach has been chosen</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BalanceResource"><code>BalanceResource</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Structure of an account balance</div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Label of the balance </div>
+<div class="param">balanceAmount </div><div class="param-desc"><span class="param-type"><a href="#AmountType">AmountType</a></span>  </div>
+<div class="param">balanceType </div><div class="param-desc"><span class="param-type"><a href="#BalanceStatus">BalanceStatus</a></span>  </div>
+<div class="param">lastChangeDateTime (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> Timestamp of the last change of the balance amount format: date-time</div>
+<div class="param">referenceDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> Reference date for the balance format: date</div>
+<div class="param">lastCommittedTransaction (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Identification of the last committed transaction. This is actually useful for instant balance. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BalanceStatus"><code>BalanceStatus</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>Type of balance</p>
+<ul>
+<li>CLBD: (ISO20022 ClosingBooked) Accounting Balance</li>
+<li>XPCD: (ISO20022 Expected) Instant Balance</li>
+<li>VALU: Value-date balance</li>
+<li>OTHR: Other Balance</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BalancesLinks"><code>BalancesLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>links that can be used for further navigation when browsing Account Information at one account level</p>
+<ul>
+<li>self: link to the balances of a given account</li>
+<li>parent-list: link to the list of all available accounts</li>
+<li>transactions: link to the transactions of a given account</li>
+</ul>
+</div>
+    <div class="field-items">
+      <div class="param">self </div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">parent-list (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">transactions (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BeneficiariesLinks"><code>BeneficiariesLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>links that can be used for further navigation when browsing Account Information at one account level</p>
+<ul>
+<li>self: link to the beneficiaries</li>
+<li>parent-list: link to the list of all available accounts</li>
+<li>first: link to the first page of the beneficiaries result</li>
+<li>last: link to the last page of the beneficiaries result</li>
+<li>next: link to the next page of the beneficiaries result</li>
+<li>prev: link to the previous page of the beneficiaries result</li>
+</ul>
+</div>
+    <div class="field-items">
+      <div class="param">self </div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">parent-list (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">first (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">last (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">next (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">prev (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Beneficiary"><code>Beneficiary</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Specification of a beneficiary</div>
+    <div class="field-items">
+      <div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Id of the beneficiary </div>
+<div class="param">isTrusted (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> <p>The ASPSP having not implemented the trusted beneficiaries list must not set this flag.
+Otherwise, the ASPSP indicates whether or not the beneficiary has been registered by the PSU within the trusted beneficiaries list.</p>
+<ul>
+<li>true: the beneficiary is actually a trusted beneficiary (when set by ASPSP)</li>
+<li>false: the beneficiary is not a trusted beneficiary<br />
+The PISP may set this flag to &quot;true&quot; to indicate that the PSU considers the beneficiary as trusted and to be inserted within the trusted beneficiaries list, as far as this feature was implemented by the ASPSP.</li>
+<li>true: the beneficiary should be registered as a trusted beneficiary (when set by PISP)</li>
+</ul>
+ </div>
+<div class="param">creditorAgent (optional)</div><div class="param-desc"><span class="param-type"><a href="#FinancialInstitutionIdentification">FinancialInstitutionIdentification</a></span>  </div>
+<div class="param">creditor </div><div class="param-desc"><span class="param-type"><a href="#PartyIdentification">PartyIdentification</a></span>  </div>
+<div class="param">creditorAccount (optional)</div><div class="param-desc"><span class="param-type"><a href="#AccountIdentification">AccountIdentification</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BookingInformation"><code>BookingInformation</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>indicator that the payment can be immediately booked or not</p>
+<ul>
+<li>true: payment is booked</li>
+<li>false: payment is not booked</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CategoryPurposeCode"><code>CategoryPurposeCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Specifies the high level purpose of the instruction based on a set of pre-defined categories. This is used by the initiating party to provide information concerning the processing of the payment. It is likely to trigger special processing by any of the agents involved in the payment chain.
+API: The following values are allowed:</p>
+<ul>
+<li>CASH (CashManagementTransfer): Transaction is a general cash management instruction.</li>
+<li>DVPM (DeliverAgainstPayment): Code used to pre-advise the account servicer of a forthcoming deliver against payment instruction.</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ChargeBearerCode"><code>ChargeBearerCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Specifies which party/parties will bear the charges associated with the processing of the payment transaction.<br />
+API: The following values are allowed for Payment  Request</p>
+<ul>
+<li>SLEV:  Charges are to be applied following the rules agreed in the service level and/or scheme.</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ClearingSystemMemberIdentification"><code>ClearingSystemMemberIdentification</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Information used to identify a member within a clearing system.
+API: to be used for some specific international credit transfers in order to identify the beneficiary bank</div>
+    <div class="field-items">
+      <div class="param">clearingSystemId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Specification of a pre-agreed offering between clearing agents or the channel through which the payment instruction is processed. </div>
+<div class="param">memberId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Identification of a member of a clearing system. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConfirmationResource"><code>ConfirmationResource</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Confirmation request resource</div>
+    <div class="field-items">
+      <div class="param">psuAuthenticationFactor (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> authentication factor forwarded by the TPP to the ASPSP in order to fulfil the strong customer authentication process </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CreationDateTime"><code>CreationDateTime</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Date and time at which a (group of) payment instruction(s) was created by the instructing party.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CreditTransferTransaction"><code>CreditTransferTransaction</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Payment processes required to transfer cash from the debtor to the creditor.
+API:</div>
+    <div class="field-items">
+      <div class="param">paymentId </div><div class="param-desc"><span class="param-type"><a href="#PaymentIdentification">PaymentIdentification</a></span>  </div>
+<div class="param">requestedExecutionDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#RequestedExecutionDate">RequestedExecutionDate</a></span>  </div>
+<div class="param">endDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#EndDate">EndDate</a></span>  </div>
+<div class="param">executionRule (optional)</div><div class="param-desc"><span class="param-type"><a href="#ExecutionRule">ExecutionRule</a></span>  </div>
+<div class="param">frequency (optional)</div><div class="param-desc"><span class="param-type"><a href="#FrequencyCode">FrequencyCode</a></span>  </div>
+<div class="param">instructedAmount </div><div class="param-desc"><span class="param-type"><a href="#AmountType">AmountType</a></span>  </div>
+<div class="param">beneficiary (optional)</div><div class="param-desc"><span class="param-type"><a href="#Beneficiary">Beneficiary</a></span>  </div>
+<div class="param">ultimateCreditor (optional)</div><div class="param-desc"><span class="param-type"><a href="#PartyIdentification">PartyIdentification</a></span>  </div>
+<div class="param">regulatoryReportingCodes (optional)</div><div class="param-desc"><span class="param-type"><a href="#RegulatoryReportingCodes">RegulatoryReportingCodes</a></span>  </div>
+<div class="param">remittanceInformation </div><div class="param-desc"><span class="param-type"><a href="#UnstructuredRemittanceInformation">UnstructuredRemittanceInformation</a></span>  </div>
+<div class="param">transactionStatus (optional)</div><div class="param-desc"><span class="param-type"><a href="#TransactionIndividualStatusCode">TransactionIndividualStatusCode</a></span>  </div>
+<div class="param">statusReasonInformation (optional)</div><div class="param-desc"><span class="param-type"><a href="#StatusReasonInformation">StatusReasonInformation</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="EndDate"><code>EndDate</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The last applicable day of execution for a given standing order.
+If not given, the standing order is considered as endless.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorModel"><code>ErrorModel</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Generic error report structure</div>
+    <div class="field-items">
+      <div class="param">timestamp (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> current timestamp format: date-time</div>
+<div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> HTTP error code format: int32</div>
+<div class="param">error (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> HTTP error text </div>
+<div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> HTTP textual reason phrase </div>
+<div class="param">path (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Relevant path that was used </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ExecutionRule"><code>ExecutionRule</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>Execution date shifting rule for standing orders
+This data attribute defines the behaviour when recurring payment dates falls on a weekend or bank holiday.
+The payment is then executed either the &quot;preceding&quot; or &quot;following&quot; working day.
+ASPSP might reject the request due to the communicated value, if rules in Online-Banking are not supporting
+this execution rule.</p>
+<ul>
+<li>FWNG: following</li>
+<li>PREC: preceding</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FinancialInstitutionIdentification"><code>FinancialInstitutionIdentification</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Unique and unambiguous identification of a financial institution, as assigned under an internationally recognised or proprietary identification scheme.</div>
+    <div class="field-items">
+      <div class="param">bicFi </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Code allocated to a financial institution by the ISO 9362 Registration Authority as described in ISO 9362 &quot;Banking - Banking telecommunication messages - Business identification code (BIC)&quot;. </div>
+<div class="param">clearingSystemMemberId (optional)</div><div class="param-desc"><span class="param-type"><a href="#ClearingSystemMemberIdentification">ClearingSystemMemberIdentification</a></span>  </div>
+<div class="param">name (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Name of the financial institution </div>
+<div class="param">postalAddress (optional)</div><div class="param-desc"><span class="param-type"><a href="#PostalAddress">PostalAddress</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FrequencyCode"><code>FrequencyCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>Frequency rule for standing orders.
+The following codes from the &quot;EventFrequency7Code&quot; of ISO 20022 are supported.</p>
+<ul>
+<li>DAIL: Daily</li>
+<li>WEEK: Weekly</li>
+<li>TOWK: EveryTwoWeeks</li>
+<li>MNTH: Monthly</li>
+<li>TOMN: EveryTwoMonths</li>
+<li>QUTR: Quarterly</li>
+<li>SEMI: SemiAnnual</li>
+<li>YEAR: Annual
+However, each ASPSP might restrict these values into a subset if needed.</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FundsAvailabilityInformation"><code>FundsAvailabilityInformation</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>indicator that the payment can be covered or not by the funds available on the relevant account</p>
+<ul>
+<li>true: payment is covered</li>
+<li>false: payment is not covered</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GenericIdentification"><code>GenericIdentification</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Unique identification of an account, a person or an organisation, as assigned by an issuer.
+API: The ASPSP will document which account reference type it will support.</div>
+    <div class="field-items">
+      <div class="param">identification </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> API: Identifier </div>
+<div class="param">schemeName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Name of the identification scheme.
+Possible values for the scheme name, partially based on ISO20022 external code list, are the following:</p>
+<ul>
+<li>BANK (BankPartyIdentification): Unique and unambiguous assignment made by a specific bank or similar financial institution to identify a relationship as defined between the bank and its client.</li>
+<li>COID (CountryIdentificationCode) : Country authority given organisation identification (e.g., corporate registration number)</li>
+<li>SREN (SIREN): The SIREN number is a 9 digit code assigned by INSEE, the French National Institute for Statistics and Economic Studies, to identify an organisation in France.</li>
+<li>SRET (SIRET): The SIRET number is a 14 digit code assigned by INSEE, the French National Institute for Statistics and Economic Studies, to identify an organisation unit in France. It consists of the SIREN number, followed by a five digit classification number, to identify the local geographical unit of that entity.</li>
+<li>NIDN (NationalIdentityNumber): Number assigned by an authority to identify the national identity number of a person.
+Other values are also permitted, for instance:</li>
+<li>OAUT (OAUTH2): OAUTH2 access token that is owned by the PISP being also an AISP and that can be used in order to identify the PSU</li>
+<li>CPAN (CardPan): Card PAN</li>
+</ul>
+ </div>
+<div class="param">issuer (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Entity that assigns the identification. this could a country code or any organisation name or identifier that can be recognized by both parties </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GenericLink"><code>GenericLink</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>hypertext reference</div>
+    <div class="field-items">
+      <div class="param">href </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URI to be used </div>
+<div class="param">templated (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> specifies &quot;true&quot; if href is a URI template, i.e. with parameters. Otherwise, this property is absent or set to false </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalAccounts"><code>HalAccounts</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>HYPERMEDIA structure used for returning the list of the available accounts to the AISP</div>
+    <div class="field-items">
+      <div class="param">connectedPsu (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Last name and first name that has granted access to the AISP on the accounts data
+This information can be retrieved based on the PSU's authentication that occurred during the OAUTH2 access token initialisation. </div>
+<div class="param">accounts </div><div class="param-desc"><span class="param-type"><a href="#AccountResource">array[AccountResource]</a></span> List of PSU account that are made available to the TPP </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#PsuContextLinks">PsuContextLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalBalances"><code>HalBalances</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>HYPERMEDIA structure used for returning the list of the relevant balances for a given account to the AISP</div>
+    <div class="field-items">
+      <div class="param">balances </div><div class="param-desc"><span class="param-type"><a href="#BalanceResource">array[BalanceResource]</a></span> List of account balances </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#BalancesLinks">BalancesLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalBeneficiaries"><code>HalBeneficiaries</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>HYPERMEDIA structure used for returning the list of the whitelisted beneficiaries</div>
+    <div class="field-items">
+      <div class="param">beneficiaries </div><div class="param-desc"><span class="param-type"><a href="#Beneficiary">array[Beneficiary]</a></span> List of trusted beneficiaries </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#BeneficiariesLinks">BeneficiariesLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalPaymentCoverageReport"><code>HalPaymentCoverageReport</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>HYPERMEDIA structure used for returning the payment coverage report to the PIISP</div>
+    <div class="field-items">
+      <div class="param">request </div><div class="param-desc"><span class="param-type"><a href="#PaymentCoverageRequestResource">PaymentCoverageRequestResource</a></span>  </div>
+<div class="param">result </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> <p>Result of the coverage check :</p>
+<ul>
+<li>true: the payment can be covered</li>
+<li>false: the payment cannot be covered</li>
+</ul>
+ </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#PaymentCoverageReportLinks">PaymentCoverageReportLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalPaymentRequest"><code>HalPaymentRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>HYPERMEDIA structure used for returning the original Payment Request to the PISP</div>
+    <div class="field-items">
+      <div class="param">paymentRequest </div><div class="param-desc"><span class="param-type"><a href="#PaymentRequestResource">PaymentRequestResource</a></span>  </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#PaymentRequestLinks">PaymentRequestLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalPaymentRequestCreation"><code>HalPaymentRequestCreation</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>data forwarded by the ASPSP top the PISP after creation of the Payment Request resource creation</div>
+    <div class="field-items">
+      <div class="param">appliedAuthenticationApproach (optional)</div><div class="param-desc"><span class="param-type"><a href="#AppliedAuthenticationApproach">AppliedAuthenticationApproach</a></span>  </div>
+<div class="param">_links (optional)</div><div class="param-desc"><span class="param-type"><a href="#PaymentRequestResourceCreationLinks">PaymentRequestResourceCreationLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HalTransactions"><code>HalTransactions</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>HYPERMEDIA structure used for returning the list of the transactions for a given account to the AISP</div>
+    <div class="field-items">
+      <div class="param">transactions </div><div class="param-desc"><span class="param-type"><a href="#Transaction">array[Transaction]</a></span> List of transactions </div>
+<div class="param">_links </div><div class="param-desc"><span class="param-type"><a href="#TransactionsLinks">TransactionsLinks</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="LocalInstrumentCode"><code>LocalInstrumentCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: User community specific instrument.
+Usage: This element is used to specify a local instrument, local clearing option and/or further qualify the service or service level.
+API: Only &quot;INST&quot; value is allowed in order to ask for an SEPA instant Payment. Can only be used if ServiceLevel is equal to &quot;SEPA&quot;</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PartyIdentification"><code>PartyIdentification</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>API : Description of a Party which can be either a person or an organization.</div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Name by which a party is known and which is usually used to identify that party. </div>
+<div class="param">postalAddress (optional)</div><div class="param-desc"><span class="param-type"><a href="#PostalAddress">PostalAddress</a></span>  </div>
+<div class="param">organisationId (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericIdentification">GenericIdentification</a></span> Unique and unambiguous way to identify an organisation. </div>
+<div class="param">privateId (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericIdentification">GenericIdentification</a></span> Unique and unambiguous identification of a person. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentCoverageReportLinks"><code>PaymentCoverageReportLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>links that can be used for further navigation to post another coverage request.</div>
+    <div class="field-items">
+      <div class="param">self </div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentCoverageRequestResource"><code>PaymentCoverageRequestResource</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Payment coverage request structure. The request must rely either on a cash account or a payment card.</div>
+    <div class="field-items">
+      <div class="param">paymentCoverageRequestId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Identification of the payment Coverage Request </div>
+<div class="param">payee (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The merchant where the card is accepted as information to the PSU. </div>
+<div class="param">instructedAmount </div><div class="param-desc"><span class="param-type"><a href="#AmountType">AmountType</a></span>  </div>
+<div class="param">accountId </div><div class="param-desc"><span class="param-type"><a href="#AccountIdentification">AccountIdentification</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentIdentification"><code>PaymentIdentification</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Set of elements used to reference a payment instruction.</div>
+    <div class="field-items">
+      <div class="param">resourceId (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceId">ResourceId</a></span>  </div>
+<div class="param">instructionId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>ISO20022: Unique identification as assigned by an instructing party for an instructed party to unambiguously identify the instruction.</p>
+<p>API: Unique identification shared between the PISP and the ASPSP</p>
+ </div>
+<div class="param">endToEndId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>ISO20022: Unique identification assigned by the initiating party to unambiguously identify the transaction. This identification is passed on, unchanged, throughout the entire end-to-end chain.</p>
+<p>API: Unique identification shared between the merchant and the PSU</p>
+ </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentInformationId"><code>PaymentInformationId</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022 : Reference assigned by a sending party to unambiguously identify the payment information block within the message.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentInformationStatusCode"><code>PaymentInformationStatusCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Specifies the status of the payment information.
+API: Mandatory. The following values are allowed to provide the status of the Payment Request</p>
+<ul>
+<li>ACCP (AcceptedCustomerProfile): Preceding check of technical validation was successful. Customer profile check was also successful.</li>
+<li>ACSC (AcceptedSettlementCompleted): Settlement on the debtor's account has been completed.</li>
+<li>ACSP (AcceptedSettlementInProcess): All preceding checks such as technical validation and customer profile were successful. Dynamic risk assessment is now also successful and therefore the Payment Request has been accepted for execution.</li>
+<li>ACTC (AcceptedTechnicalValidation): Authentication and syntactical and semantical validation are successful.</li>
+<li>ACWC (AcceptedWithChange): Instruction is accepted but a change will be made, such as date or remittance not sent.</li>
+<li>ACWP (AcceptedWithoutPosting): Payment instruction included in the credit transfer is accepted without being posted to the creditor customer’s account.</li>
+<li>PART (PartiallyAccepted): A number of transactions have been accepted, whereas another number of transactions have not yet achieved 'accepted' status.</li>
+<li>RCVD (Received): Payment initiation has been received by the receiving agent.</li>
+<li>PDNG (Pending): Payment request or individual transaction included in the Payment Request is pending. Further checks and status update will be performed.</li>
+<li>RJCT (Rejected): Payment request  has been rejected.</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentRequestLinks"><code>PaymentRequestLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>links that can be used for further navigation when having post a Payment Request in order to get the relevant status report.</div>
+    <div class="field-items">
+      <div class="param">self (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">confirmation (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span> This link shall not been provided when the confirmation has already been posted. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentRequestResource"><code>PaymentRequestResource</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: The PaymentRequestResource message is sent by the Creditor sending party to the Debtor receiving party, directly or through agents. It is used by a Creditor to request movement of funds from the debtor account to a creditor.
+API:
+Information about the creditor (Id, account and agent) might be placed either at payment level or at instruction level. Thus multi-beneficiary payments can be handled.
+The requested execution date can be placed either at payment level when all instructions are requested to be executed at the same date or at instruction level.
+The latest case includes:</p>
+<ul>
+<li>multiple instructions having different requested execution dates</li>
+<li>standing orders settings</li>
+</ul>
+</div>
+    <div class="field-items">
+      <div class="param">resourceId (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceId">ResourceId</a></span>  </div>
+<div class="param">paymentInformationId </div><div class="param-desc"><span class="param-type"><a href="#PaymentInformationId">PaymentInformationId</a></span>  </div>
+<div class="param">creationDateTime </div><div class="param-desc"><span class="param-type"><a href="#CreationDateTime">CreationDateTime</a></span>  </div>
+<div class="param">numberOfTransactions </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> ISO20022: Number of individual transactions contained in the message.
+API: Each ASPSP will specify a maximum value for this field taking into accounts its specificities about payment request handling </div>
+<div class="param">initiatingParty </div><div class="param-desc"><span class="param-type"><a href="#PartyIdentification">PartyIdentification</a></span>  </div>
+<div class="param">paymentTypeInformation </div><div class="param-desc"><span class="param-type"><a href="#PaymentTypeInformation">PaymentTypeInformation</a></span>  </div>
+<div class="param">debtor (optional)</div><div class="param-desc"><span class="param-type"><a href="#PartyIdentification">PartyIdentification</a></span>  </div>
+<div class="param">debtorAccount (optional)</div><div class="param-desc"><span class="param-type"><a href="#AccountIdentification">AccountIdentification</a></span>  </div>
+<div class="param">debtorAgent (optional)</div><div class="param-desc"><span class="param-type"><a href="#FinancialInstitutionIdentification">FinancialInstitutionIdentification</a></span>  </div>
+<div class="param">beneficiary (optional)</div><div class="param-desc"><span class="param-type"><a href="#Beneficiary">Beneficiary</a></span>  </div>
+<div class="param">ultimateCreditor (optional)</div><div class="param-desc"><span class="param-type"><a href="#PartyIdentification">PartyIdentification</a></span>  </div>
+<div class="param">purpose (optional)</div><div class="param-desc"><span class="param-type"><a href="#PurposeCode">PurposeCode</a></span>  </div>
+<div class="param">chargeBearer (optional)</div><div class="param-desc"><span class="param-type"><a href="#ChargeBearerCode">ChargeBearerCode</a></span>  </div>
+<div class="param">paymentInformationStatus (optional)</div><div class="param-desc"><span class="param-type"><a href="#PaymentInformationStatusCode">PaymentInformationStatusCode</a></span>  </div>
+<div class="param">statusReasonInformation (optional)</div><div class="param-desc"><span class="param-type"><a href="#StatusReasonInformation">StatusReasonInformation</a></span>  </div>
+<div class="param">fundsAvailability (optional)</div><div class="param-desc"><span class="param-type"><a href="#FundsAvailabilityInformation">FundsAvailabilityInformation</a></span>  </div>
+<div class="param">booking (optional)</div><div class="param-desc"><span class="param-type"><a href="#BookingInformation">BookingInformation</a></span>  </div>
+<div class="param">requestedExecutionDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span> ISO20022: Date at which the initiating party requests the clearing agent to process the payment. format: date-time</div>
+<div class="param">creditTransferTransaction </div><div class="param-desc"><span class="param-type"><a href="#CreditTransferTransaction">array[CreditTransferTransaction]</a></span> ISO20022: Payment processes required to transfer cash from the debtor to the creditor.
+API: Each ASPSP will specify a maxItems value for this field taking into accounts its specificities about payment request handling </div>
+<div class="param">supplementaryData </div><div class="param-desc"><span class="param-type"><a href="#SupplementaryData">SupplementaryData</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentRequestResourceCreationLinks"><code>PaymentRequestResourceCreationLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>links that can be used for further navigation, especially in REDIRECT approach</div>
+    <div class="field-items">
+      <div class="param">consentApproval (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span> URL to be used by the PISP in order to start the ASPSP authentication and consent management process </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PaymentTypeInformation"><code>PaymentTypeInformation</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Set of elements used to further specify the type of transaction.</div>
+    <div class="field-items">
+      <div class="param">instructionPriority (optional)</div><div class="param-desc"><span class="param-type"><a href="#PriorityCode">PriorityCode</a></span>  </div>
+<div class="param">serviceLevel </div><div class="param-desc"><span class="param-type"><a href="#ServiceLevelCode">ServiceLevelCode</a></span>  </div>
+<div class="param">localInstrument (optional)</div><div class="param-desc"><span class="param-type"><a href="#LocalInstrumentCode">LocalInstrumentCode</a></span>  </div>
+<div class="param">categoryPurpose (optional)</div><div class="param-desc"><span class="param-type"><a href="#CategoryPurposeCode">CategoryPurposeCode</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PostalAddress"><code>PostalAddress</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022 : Information that locates and identifies a specific address, as defined by postal services.</div>
+    <div class="field-items">
+      <div class="param">country </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ISO20022: Country in which a person resides (the place of a person's home). In the case of a company, it is the country from which the affairs of that company are directed. </div>
+<div class="param">addressLine </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Unstructured address. The two lines must embed zip code and town name </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PriorityCode"><code>PriorityCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Indicator of the urgency or order of importance that the instructing party would like the instructed party to apply to the processing of the instruction.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PsuContextLinks"><code>PsuContextLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>Links that can be used for further navigation when browsing Account Information at top level</p>
+<ul>
+<li>self: link to the list of all available accounts</li>
+</ul>
+</div>
+    <div class="field-items">
+      <div class="param">self </div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">beneficiaries (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">first (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">last (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">next (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">prev (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PurposeCode"><code>PurposeCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Underlying reason for the payment transaction, as published in an external purpose code list.<br />
+API: The following values are allowed for Payment  Request</p>
+<ul>
+<li>ACCT (Funds moved between 2 accounts of same account holder at the same bank)</li>
+<li>CASH (general cash management instruction) may be used for Transfer Initiation</li>
+<li>COMC Transaction is related to a payment of commercial credit or debit.</li>
+<li>CPKC General Carpark Charges Transaction is related to carpark charges.</li>
+<li>TRPT Transport RoadPricing Transaction is for the payment to top-up pre-paid card and electronic road pricing for the purpose of transportation</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RegulatoryReportingCode"><code>RegulatoryReportingCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Information needed due to regulatory and statutory requirements.
+Economical codes to be used are provided by the National Competent Authority</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RegulatoryReportingCodes"><code>RegulatoryReportingCodes</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>List of needed regulatory reporting codes for international payments</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RequestedExecutionDate"><code>RequestedExecutionDate</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Date at which the initiating party requests the clearing agent to process the payment.
+API:<br />
+This date can be used in the following cases:</p>
+<ul>
+<li>the single requested execution date for a payment having several instructions. In this case, this field must be set at the payment level.</li>
+<li>the requested execution date for a given instruction within a payment. In this case, this field must be set at each instruction level.</li>
+<li>The first date of execution for a standing order.
+When the payment cannot be processed at this date, the ASPSP is allowed to shift the applied execution date to the next possible execution date for non-standing orders.
+For standing orders, the [executionRule] parameter helps to compute the execution date to be applied.</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ResourceId"><code>ResourceId</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>API: Identifier assigned by the ASPSP for further use of the created resource through API calls</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ServiceLevelCode"><code>ServiceLevelCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Agreement under which or rules under which the transaction should be processed. Specifies a pre-agreed service or level of service between the parties, as published in an external service level code list.
+API: Only &quot;SEPA&quot; (SEPA Credit Transfer) or &quot;NURG&quot; (Other Credit Transfer) values are allowed</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StatusReasonInformation"><code>StatusReasonInformation</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Provides detailed information on the status reason.</p>
+<p>API: Can only be used in status equal to &quot;RJCT&quot;. Only the following values are allowed:</p>
+<ul>
+<li>AC01 (IncorectAccountNumber): the account number is either invalid or does not exist</li>
+<li>AC04 (ClosedAccountNumber): the account is closed and cannot be used</li>
+<li>AC06 (BlockedAccount): the account is blocked and cannot be used</li>
+<li>AG01 (Transaction forbidden): Transaction forbidden on this type of account</li>
+<li>AM18 (InvalidNumberOfTransactions): the number of transactions exceeds the ASPSP acceptance limit</li>
+<li>CH03 (RequestedExecutionDateOrRequestedCollectionDateTooFarInFuture): The requested execution date is too far in the future</li>
+<li>CUST (RequestedByCustomer): The reject is due to the debtor: refusal or lack of liquidity</li>
+<li>DS02 (OrderCancelled): An authorized user has cancelled the order</li>
+<li>FF01 (InvalidFileFormat): The reject is due to the original Payment Request which is invalid (syntax, structure or values)</li>
+<li>FRAD (FraudulentOriginated): the Payment Request is considered as fraudulent</li>
+<li>MS03 (NotSpecifiedReasonAgentGenerated): No reason specified by the ASPSP</li>
+<li>NOAS (NoAnswerFromCustomer): The PSU has neither accepted nor rejected the Payment Request and a time-out has occurred</li>
+<li>RR01 (MissingDebtorAccountOrIdentification): The Debtor account and/or Identification are missing or inconsistent</li>
+<li>RR03 (MissingCreditorNameOrAddress): Specification of the creditor’s name and/or address needed for regulatory requirements is insufficient or missing.</li>
+<li>RR04 (RegulatoryReason): Reject from regulatory reason</li>
+<li>RR12 (InvalidPartyID): Invalid or missing identification required within a particular country or payment type.</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SupplementaryData"><code>SupplementaryData</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Additional information that cannot be captured in the structured elements and/or any other specific block.</p>
+<p>API: This structure is used to embed the relevant URLs for returning the status report to the PISP and to specify which authentication approaches are accepted by the PISP and which has been chosen by the ASPSP</p>
+</div>
+    <div class="field-items">
+      <div class="param">acceptedAuthenticationApproach (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> can only be set by the PISP
+authentication approaches that are supported by the PISP. The PISP can provide several choices separated by commas.
+REDIRECT: the PSU is redirected by the TPP to the ASPSP which processes identification and authentication
+DECOUPLED: the TPP identifies the PSU and forwards the identification to the ASPSP which processes the authentication through a decoupled device
+EMBEDDED: the TPP identifies the PSU and forwards the identification to the ASPSP which starts the authentication. The TPP forwards one authentication factor of the PSU (e.g. OTP or response to a challenge) </div>
+        <div class="param-enum-header">Enum:</div>
+        
+<div class="param">appliedAuthenticationApproach (optional)</div><div class="param-desc"><span class="param-type"><a href="#AppliedAuthenticationApproach">AppliedAuthenticationApproach</a></span>  </div>
+<div class="param">scaHint (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> can only be set by the PISP
+Hint given by the merchant and/or the PISP about an SCA exemption context </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">noScaExemption</div><div class="param-enum">scaExemption</div>
+<div class="param">successfulReportUrl (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL to be used by the ASPSP in order to notify the PISP of the finalisation of the authentication and consent process in REDIRECT and DECOUPLED approach </div>
+<div class="param">unsuccessfulReportUrl (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> URL to be used by the ASPSP in order to notify the PISP of the failure of the authentication and consent process in REDIRECT and DECOUPLED approach
+If this URL is not provided by the PISP, the ASPSP will use the &quot;successfulReportUrl&quot; even in case of failure of the Payment Request processing </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Transaction"><code>Transaction</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>structure of a transaction</div>
+    <div class="field-items">
+      <div class="param">resourceId (optional)</div><div class="param-desc"><span class="param-type"><a href="#ResourceId">ResourceId</a></span>  </div>
+<div class="param">entryReference (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Technical incremental identification of the transaction. </div>
+<div class="param">transactionAmount </div><div class="param-desc"><span class="param-type"><a href="#AmountType">AmountType</a></span>  </div>
+<div class="param">creditDebitIndicator </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> <p>Accounting flow of the transaction</p>
+<ul>
+<li>CRDT: Credit type transaction</li>
+<li>DBIT: Debit type transaction</li>
+</ul>
+ </div>
+        <div class="param-enum-header">Enum:</div>
+        <div class="param-enum">CRDT</div><div class="param-enum">DBIT</div>
+<div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#TransactionStatus">TransactionStatus</a></span>  </div>
+<div class="param">bookingDate </div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> Booking date of the transaction on the account format: date</div>
+<div class="param">valueDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> Value date of the transaction on the account format: date</div>
+<div class="param">transactionDate (optional)</div><div class="param-desc"><span class="param-type"><a href="#date">date</a></span> <p>Date used for specific purposes:</p>
+<ul>
+<li>for card transaction: date of the transaction</li>
+<li>for credit transfer: acquiring date of the transaction</li>
+<li>for direct debit: receiving date of the transaction</li>
+</ul>
+ format: date</div>
+<div class="param">remittanceInformation </div><div class="param-desc"><span class="param-type"><a href="#UnstructuredRemittanceInformation">UnstructuredRemittanceInformation</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransactionIndividualStatusCode"><code>TransactionIndividualStatusCode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>ISO20022: Specifies the status of the payment information group.</p>
+<p>API: Only the following values are allowed to provide the status of the subsequent CREDIT TRANSFER to the Payment Request</p>
+<ul>
+<li>RJCT: Payment request or individual transaction included in the Payment Request has been rejected.</li>
+<li>PDNG: (Pending): Payment request or individual transaction included in the Payment Request is pending. Further checks and status update will be performed.</li>
+<li>ACSP: All preceding checks such as technical validation and customer profile were successful and therefore the Payment Request has been accepted for execution.</li>
+<li>ACSC: Settlement on the debtor's account has been completed</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransactionStatus"><code>TransactionStatus</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>Type of Transaction</p>
+<ul>
+<li>BOOK: (ISO20022 ClosingBooked) Accounted transaction</li>
+<li>PDNG: (ISO20022 Expected) Instant Balance Transaction</li>
+<li>OTHR: Other</li>
+</ul>
+</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransactionsLinks"><code>TransactionsLinks</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'><p>links that can be used for further navigation when browsing Account Information at one account level</p>
+<ul>
+<li>self: link to the transactions of a given account</li>
+<li>parent-list: link to the list of all available accounts</li>
+<li>balances: link to the balances of a given account</li>
+<li>first: link to the first page of the transactions result</li>
+<li>last: link to the last page of the transactions result</li>
+<li>next: link to the next page of the transactions result</li>
+<li>prev: link to the previous page of the transactions result</li>
+</ul>
+</div>
+    <div class="field-items">
+      <div class="param">self </div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">parent-list (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">balances (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">first (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">last (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">next (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+<div class="param">prev (optional)</div><div class="param-desc"><span class="param-type"><a href="#GenericLink">GenericLink</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="UnstructuredRemittanceInformation"><code>UnstructuredRemittanceInformation</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>ISO20022: Information supplied to enable the matching of an entry with the items that the transfer is intended to settle, such as commercial invoices in an accounts' receivable system.
+API: Only one occurrence is allowed</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>
